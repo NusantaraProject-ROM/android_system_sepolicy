@@ -977,6 +977,9 @@ get_prop(system_server, system_lmk_prop)
 # Only system server can access BINDER_FREEZE and BINDER_GET_FROZEN_INFO
 allowxperm system_server binder_device:chr_file ioctl { BINDER_FREEZE BINDER_GET_FROZEN_INFO };
 
+# allow system_server to look into theme resources
+allow system_server theme_data_file:dir search;
+
 ###
 ### Neverallow rules
 ###

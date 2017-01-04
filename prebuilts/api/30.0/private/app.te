@@ -43,3 +43,7 @@ neverallow { appdomain -mediaprovider_app } storage_config_prop:file no_rw_file_
 
 # Allow to read graphics related properties.
 get_prop(appdomain, graphics_config_prop)
+
+# Themed resources (i.e. composed icons)
+allow appdomain theme_data_file:dir r_dir_perms;
+allow appdomain theme_data_file:file r_file_perms;
