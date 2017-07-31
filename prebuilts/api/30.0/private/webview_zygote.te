@@ -80,6 +80,10 @@ allow webview_zygote system_data_file:lnk_file r_file_perms;
 # Send unsolicited message to system_server
 unix_socket_send(webview_zygote, system_unsolzygote, system_server)
 
+# Themes
+allow webview_zygote theme_data_file:file r_file_perms;
+allow webview_zygote theme_data_file:dir r_dir_perms;
+
 #####
 ##### Neverallow
 #####

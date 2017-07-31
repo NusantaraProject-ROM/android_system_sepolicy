@@ -70,6 +70,10 @@ allow app_zygote system_data_file:file { getattr read map };
 # Send unsolicited message to system_server
 unix_socket_send(app_zygote, system_unsolzygote, system_server)
 
+# Themes
+allow app_zygote theme_data_file:file r_file_perms;
+allow app_zygote theme_data_file:dir r_dir_perms;
+
 #####
 ##### Neverallow
 #####
