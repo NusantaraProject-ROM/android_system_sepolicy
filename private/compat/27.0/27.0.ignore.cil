@@ -41,6 +41,7 @@
     device_config_reset_performed_prop
     device_config_netd_native_prop
     dnsresolver_service
+    dufont_service
     exfat
     exported2_config_prop
     exported2_default_prop
@@ -171,6 +172,8 @@
     traced_tmpfs
     traceur_app
     traceur_app_tmpfs
+    theme_data_file
+    theme_prop
     untrusted_app_all_devpts
     update_engine_log_data_file
     uri_grants_service

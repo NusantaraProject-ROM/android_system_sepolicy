@@ -44,6 +44,7 @@
     device_config_sys_traced_prop
     device_config_window_manager_native_boot_prop
     device_config_configuration_prop
+    dufont_service
     emergency_affordance_service
     exported_camera_prop
     fastbootd_protocol_prop
@@ -113,6 +114,7 @@
     system_passwd_file
     system_unsolzygote_socket
     tethering_service
+    theme_data_file
     traced_perf
     traced_perf_enabled_prop
     traced_perf_socket
