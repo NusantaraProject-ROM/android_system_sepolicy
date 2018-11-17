@@ -157,6 +157,9 @@ control_logd(system_app)
 read_runtime_log_tags(system_app)
 get_prop(system_app, device_logging_prop)
 
+# Allow Settings to read ro.vendor.build.security_patch
+get_prop(system_app, vendor_security_patch_level_prop)
+
 # allow system apps to use UDP sockets provided by the system server but not
 # modify them other than to connect
 allow system_app system_server:udp_socket {
