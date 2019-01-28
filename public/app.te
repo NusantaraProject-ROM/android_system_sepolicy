@@ -55,6 +55,9 @@ allow appdomain system_server:fifo_file rw_file_perms;
 allow appdomain system_server:unix_stream_socket { read write setopt getattr getopt shutdown };
 allow appdomain system_server:tcp_socket { read write getattr getopt shutdown };
 
+# For AppFuse.
+allow appdomain vold:fd use;
+
 # Communication with other apps via fifos
 allow appdomain appdomain:fifo_file rw_file_perms;
 
@@ -115,9 +118,6 @@ r_dir_file(appdomain, vendor_framework_file)
 # Allow apps read / execute access to vendor public libraries.
 allow appdomain vendor_public_lib_file:dir r_dir_perms;
 allow appdomain vendor_public_lib_file:file { execute read open getattr map };
-
-# Execute dex2oat when apps call dexclassloader
-allow appdomain dex2oat_exec:file rx_file_perms;
 
 # Read/write wallpaper file (opened by system).
 allow appdomain wallpaper_file:file { getattr read write map };
@@ -358,8 +358,8 @@ allow appdomain dropbox_data_file:file { getattr read };
 ###
 
 # Superuser capabilities.
-# bluetooth requires net_admin and wake_alarm.
-neverallow { appdomain -bluetooth } self:capability_class_set *;
+# bluetooth requires net_admin and wake_alarm. network stack app requires net_admin.
+neverallow { appdomain -bluetooth -network_stack } self:capability_class_set *;
 
 # Block device access.
 neverallow appdomain dev_type:blk_file { read write };
@@ -432,16 +432,10 @@ neverallow { appdomain -shell } { domain -appdomain }:file no_rw_file_perms;
 # sigchld allowed for parent death notification.
 # signull allowed for kill(pid, 0) existence test.
 # All others prohibited.
-neverallow appdomain { domain -appdomain }:process
+# -perfetto is to allow shell (which is an appdomain) to kill perfetto
+# (see private/shell.te).
+neverallow appdomain { domain -appdomain -perfetto }:process
     { sigkill sigstop signal };
-
-# Transition to a non-app domain.
-# Exception for the shell and su domains, can transition to runas, etc.
-# Exception for crash_dump.
-neverallow { appdomain -shell userdebug_or_eng(`-su') } { domain -appdomain -crash_dump }:process
-    { transition };
-neverallow { appdomain -shell userdebug_or_eng(`-su') } { domain -appdomain }:process
-    { dyntransition };
 
 # Write to rootfs.
 neverallow appdomain rootfs:dir_file_class_set

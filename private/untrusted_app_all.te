@@ -22,7 +22,12 @@
 
 # Some apps ship with shared libraries and binaries that they write out
 # to their sandbox directory and then execute.
-allow untrusted_app_all { app_data_file privapp_data_file }:file { r_file_perms execute };
+allow untrusted_app_all privapp_data_file:file { r_file_perms execute };
+allow untrusted_app_all app_data_file:file     { r_file_perms execute };
+
+# Allow loading and deleting renderscript created shared libraries
+# within an application home directory.
+allow untrusted_app_all rs_data_file:file { r_file_perms execute unlink };
 
 # ASEC
 allow untrusted_app_all asec_apk_file:file r_file_perms;
@@ -122,6 +127,9 @@ unix_socket_connect(untrusted_app_all, traced_producer, traced)
 allow untrusted_app_all system_server:udp_socket {
         connect getattr read recvfrom sendto write getopt setopt };
 
+# Allow the renderscript compiler to be run.
+domain_auto_trans(untrusted_app_all, rs_exec, rs)
+
 # This is allowed for targetSdkVersion <= 25 but disallowed on newer versions.
 dontaudit untrusted_app_all net_dns_prop:file read;
 
@@ -140,3 +148,10 @@ create_pty(untrusted_app_all)
 # the ACTION_USER_UNLOCKED intent is delivered. Suppress this
 # denial to prevent third party apps from spamming the logs.
 dontaudit untrusted_app_all system_data_file:dir write;
+
+# Allow access to kcov via its ioctl interface for coverage
+# guided kernel fuzzing.
+userdebug_or_eng(`
+  allow untrusted_app_all debugfs_kcov:file rw_file_perms;
+  allowxperm untrusted_app_all debugfs_kcov:file ioctl { KCOV_INIT_TRACE KCOV_ENABLE KCOV_DISABLE };
+')
