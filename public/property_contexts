@@ -81,6 +81,7 @@ persist.radio.multisim.config u:object_r:exported3_radio_prop:s0 exact string
 persist.sys.dalvik.vm.lib.2 u:object_r:exported2_system_prop:s0 exact string
 persist.sys.media.avsync u:object_r:exported2_system_prop:s0 exact bool
 persist.sys.hdmi.keep_awake u:object_r:exported2_system_prop:s0 exact bool
+persist.sys.sf.color_mode u:object_r:exported2_system_prop:s0 exact int
 persist.sys.sf.color_saturation u:object_r:exported2_system_prop:s0 exact string
 persist.sys.sf.native_mode u:object_r:exported2_system_prop:s0 exact int
 pm.dexopt.ab-ota u:object_r:exported_pm_prop:s0 exact string
@@ -374,3 +375,7 @@ ro.surface_flinger.vsync_event_phase_offset_ns u:object_r:exported_default_prop:
 ro.surface_flinger.vsync_sf_event_phase_offset_ns u:object_r:exported_default_prop:s0 int
 ro.surface_flinger.wcg_composition_dataspace u:object_r:exported_default_prop:s0 int
 ro.surface_flinger.wcg_composition_pixel_format u:object_r:exported_default_prop:s0 int
+ro.surface_flinger.display_primary_red u:object_r:exported_default_prop:s0 string
+ro.surface_flinger.display_primary_green u:object_r:exported_default_prop:s0 string
+ro.surface_flinger.display_primary_blue u:object_r:exported_default_prop:s0 string
+ro.surface_flinger.display_primary_white u:object_r:exported_default_prop:s0 string
