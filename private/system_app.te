@@ -36,6 +36,9 @@ allow system_app wallpaper_file:file r_file_perms;
 # Read icon file.
 allow system_app icon_file:file r_file_perms;
 
+# Access to Device part file.
+allow system_app sysfs:file { getattr read write open };
+
 # Write to properties
 set_prop(system_app, bluetooth_a2dp_offload_prop)
 set_prop(system_app, bluetooth_audio_hal_prop)
