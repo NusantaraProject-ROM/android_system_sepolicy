@@ -18,9 +18,11 @@
     apexd_prop
     apexd_tmpfs
     app_zygote
+    audio_config_prop
     atrace
     binder_calls_stats_service
     biometric_service
+    boot_status_prop
     bootloader_boot_reason_prop
     blank_screen
     blank_screen_exec
@@ -39,6 +41,7 @@
     ctl_interface_start_prop
     ctl_interface_stop_prop
     ctl_sigstop_prop
+    dalvik_config_prop
     device_config_boot_count_prop
     device_config_reset_performed_prop
     device_config_netd_native_prop
@@ -67,7 +70,6 @@
     exported2_radio_prop
     exported2_system_prop
     exported2_vold_prop
-    exported3_default_prop
     exported3_radio_prop
     exported3_system_prop
     fastbootd
@@ -109,6 +111,7 @@
     llkd_exec
     llkd_prop
     llkd_tmpfs
+    lmkd_config_prop
     looper_stats_service
     lowpan_device
     lowpan_prop
@@ -161,12 +164,15 @@
     statscompanion_service
     storaged_data_file
     super_block_device
+    surfaceflinger_color_prop
+    surfaceflinger_prop
     sysfs_fs_ext4_features
     system_boot_reason_prop
     system_bootstrap_lib_file
     system_lmk_prop
     system_net_netd_hwservice
     system_update_service
+    systemsound_config_prop
     test_boot_reason_prop
     thermal_service
     thermalcallback_hwservice
@@ -203,10 +209,12 @@
     vendor_shell
     vendor_socket_hook_prop
     vndk_prop
+    vold_config_prop
     vold_metadata_file
     vold_prepare_subdirs
     vold_prepare_subdirs_exec
     vold_service
+    vold_status_prop
     vrflinger_vsync_service
     wait_for_keymaster
     wait_for_keymaster_exec

@@ -4,7 +4,7 @@
 ### server.
 ###
 
-typeattribute system_app coredomain;
+typeattribute system_app coredomain, mlstrustedsubject;
 
 app_domain(system_app)
 net_domain(system_app)
@@ -48,13 +48,13 @@ set_prop(system_app, exported2_system_prop)
 set_prop(system_app, exported3_system_prop)
 set_prop(system_app, logd_prop)
 set_prop(system_app, net_radio_prop)
-set_prop(system_app, system_radio_prop)
-set_prop(system_app, exported_system_radio_prop)
+set_prop(system_app, usb_control_prop)
+set_prop(system_app, usb_prop)
 set_prop(system_app, log_tag_prop)
 userdebug_or_eng(`set_prop(system_app, logpersistd_logging_prop)')
 auditallow system_app net_radio_prop:property_service set;
-auditallow system_app system_radio_prop:property_service set;
-auditallow system_app exported_system_radio_prop:property_service set;
+auditallow system_app usb_control_prop:property_service set;
+auditallow system_app usb_prop:property_service set;
 # Allow Settings to enable Dynamic System Update
 set_prop(system_app, dynamic_system_prop)
 
@@ -83,9 +83,6 @@ binder_call(system_app, statsd)
 
 # Allow system apps to interact with incidentd
 binder_call(system_app, incidentd)
-
-# Allow system apps to interact with gpuservice
-binder_call(system_app, gpuservice)
 
 # Allow system app to interact with Dumpstate HAL
 hal_client_domain(system_app, hal_dumpstate)
@@ -155,6 +152,9 @@ get_prop(system_app, device_logging_prop)
 # modify them other than to connect
 allow system_app system_server:udp_socket {
         connect getattr read recvfrom sendto write getopt setopt };
+
+# Settings app reads ro.oem_unlock_supported
+get_prop(system_app, oem_unlock_prop)
 
 ###
 ### Neverallow rules

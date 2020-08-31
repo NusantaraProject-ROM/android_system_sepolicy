@@ -33,6 +33,8 @@
 /sys                u:object_r:sysfs:s0
 /apex               u:object_r:apex_mnt_dir:s0
 
+/apex/(\.(bootstrap|default)-)?apex-info-list.xml u:object_r:apex_info_file:s0
+
 # Symlinks
 /bin                u:object_r:rootfs:s0
 /bugreports         u:object_r:rootfs:s0
@@ -95,6 +97,7 @@
 /dev/cgroup_info(/.*)?  u:object_r:cgroup_rc_file:s0
 /dev/fscklogs(/.*)?	u:object_r:fscklogs:s0
 /dev/fuse		u:object_r:fuse_device:s0
+/dev/gnss[0-9]+		u:object_r:gnss_device:s0
 /dev/graphics(/.*)?	u:object_r:graphics_device:s0
 /dev/hw_random		u:object_r:hw_random_device:s0
 /dev/hwbinder		u:object_r:hwbinder_device:s0
@@ -212,6 +215,7 @@
 /system/bin/fsck_msdos	--	u:object_r:fsck_exec:s0
 /system/bin/tcpdump	--	u:object_r:tcpdump_exec:s0
 /system/bin/tune2fs	--	u:object_r:fsck_exec:s0
+/system/bin/resize2fs	--	u:object_r:fsck_exec:s0
 /system/bin/toolbox	--	u:object_r:toolbox_exec:s0
 /system/bin/toybox	--	u:object_r:toolbox_exec:s0
 /system/bin/ld\.mc              u:object_r:rs_exec:s0
@@ -256,8 +260,6 @@
 /system/bin/keystore	u:object_r:keystore_exec:s0
 /system/bin/fingerprintd u:object_r:fingerprintd_exec:s0
 /system/bin/gatekeeperd u:object_r:gatekeeperd_exec:s0
-/system/bin/crash_dump32 u:object_r:crash_dump_exec:s0
-/system/bin/crash_dump64 u:object_r:crash_dump_exec:s0
 /system/bin/tombstoned u:object_r:tombstoned_exec:s0
 /system/bin/recovery-persist     u:object_r:recovery_persist_exec:s0
 /system/bin/recovery-refresh     u:object_r:recovery_refresh_exec:s0
@@ -308,6 +310,7 @@
 /system/bin/idmap u:object_r:idmap_exec:s0
 /system/bin/idmap2(d)?           u:object_r:idmap_exec:s0
 /system/bin/update_engine        u:object_r:update_engine_exec:s0
+/system/bin/profcollectd         u:object_r:profcollectd_exec:s0
 /system/bin/storaged             u:object_r:storaged_exec:s0
 /system/bin/wpantund             u:object_r:wpantund_exec:s0
 /system/bin/virtual_touchpad     u:object_r:virtual_touchpad_exec:s0
@@ -456,6 +459,18 @@
 /(system_ext|system/system_ext)/lib(64)?(/.*)?      u:object_r:system_lib_file:s0
 
 #############################
+# VendorDlkm files
+# This includes VENDOR Dynamically Loadable Kernel Modules and other misc files.
+#
+/(vendor_dlkm|vendor/vendor_dlkm|system/vendor/vendor_dlkm)(/.*)?         u:object_r:vendor_file:s0
+
+#############################
+# OdmDlkm files
+# This includes ODM Dynamically Loadable Kernel Modules and other misc files.
+#
+/(odm_dlkm|vendor/odm_dlkm|system/vendor/odm_dlkm)(/.*)?                  u:object_r:vendor_file:s0
+
+#############################
 # Vendor files from /(product|system/product)/vendor_overlay
 #
 # NOTE: For additional vendor file contexts for vendor overlay files,
@@ -519,7 +534,7 @@
 # Misc data
 /data/misc/adb(/.*)?            u:object_r:adb_keys_file:s0
 /data/misc/apexdata(/.*)?       u:object_r:apex_module_data_file:s0
-/data/misc/apexdata/com.android.permission(/.*)?    u:object_r:apex_permission_data_file:s0
+/data/misc/apexdata/com\.android\.permission(/.*)?    u:object_r:apex_permission_data_file:s0
 /data/misc/apexdata/com\.android\.wifi(/.*)?    u:object_r:apex_wifi_data_file:s0
 /data/misc/apexrollback(/.*)?   u:object_r:apex_rollback_data_file:s0
 /data/misc/apns(/.*)?           u:object_r:radio_data_file:s0
@@ -550,6 +565,7 @@
 /data/misc/network_watchlist(/.*)? u:object_r:network_watchlist_data_file:s0
 /data/misc/perfetto-traces(/.*)? u:object_r:perfetto_traces_data_file:s0
 /data/misc/prereboot(/.*)?      u:object_r:prereboot_data_file:s0
+/data/misc/profcollectd(/.*)?   u:object_r:profcollectd_data_file:s0
 /data/misc/recovery(/.*)?       u:object_r:recovery_data_file:s0
 /data/misc/shared_relro(/.*)?   u:object_r:shared_relro_file:s0
 /data/misc/sms(/.*)?            u:object_r:radio_data_file:s0
@@ -612,8 +628,8 @@
 # Apex data directories
 /data/misc_de/[0-9]+/apexdata(/.*)?       u:object_r:apex_module_data_file:s0
 /data/misc_ce/[0-9]+/apexdata(/.*)?       u:object_r:apex_module_data_file:s0
-/data/misc_de/[0-9]+/apexdata/com.android.permission(/.*)?  u:object_r:apex_permission_data_file:s0
-/data/misc_ce/[0-9]+/apexdata/com.android.permission(/.*)?  u:object_r:apex_permission_data_file:s0
+/data/misc_de/[0-9]+/apexdata/com\.android\.permission(/.*)?  u:object_r:apex_permission_data_file:s0
+/data/misc_ce/[0-9]+/apexdata/com\.android\.permission(/.*)?  u:object_r:apex_permission_data_file:s0
 /data/misc_de/[0-9]+/apexdata/com\.android\.wifi(/.*)?  u:object_r:apex_wifi_data_file:s0
 /data/misc_ce/[0-9]+/apexdata/com\.android\.wifi(/.*)?  u:object_r:apex_wifi_data_file:s0
 

@@ -203,6 +203,7 @@ allow init {
 
 allow init {
   file_type
+  -apex_info_file
   -app_data_file
   -exec_type
   -gsi_data_file
@@ -375,6 +376,7 @@ allow init {
   proc_cmdline
   proc_kmsg
   proc_net
+  proc_pagetypeinfo
   proc_qtaguid_stat
   proc_slabinfo
   proc_sysrq

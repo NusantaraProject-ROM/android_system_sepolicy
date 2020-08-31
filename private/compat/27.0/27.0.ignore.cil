@@ -5,6 +5,8 @@
 (typeattribute new_objects)
 (typeattributeset new_objects
   ( new_objects
+    aac_drc_prop
+    aaudio_config_prop
     activity_task_service
     adb_service
     app_binding_service
@@ -17,18 +19,29 @@
     apexd_prop
     apexd_tmpfs
     app_zygote
+    art_apex_dir
     atrace
+    audio_config_prop
     binder_calls_stats_service
     biometric_service
     blank_screen
     blank_screen_exec
     blank_screen_tmpfs
+    boot_status_prop
     bootloader_boot_reason_prop
+    bootloader_prop
     bluetooth_a2dp_offload_prop
     bpfloader
     bpfloader_exec
+    build_odm_prop
+    build_prop
+    build_vendor_prop
+    camera_calibration_prop
+    camera_config_prop
     cgroup_bpf
+    charger_config_prop
     charger_exec
+    charger_status_prop
     color_display_service
     content_capture_service
     crossprofileapps_service
@@ -37,10 +50,13 @@
     ctl_interface_start_prop
     ctl_interface_stop_prop
     ctl_sigstop_prop
+    dalvik_config_prop
+    dalvik_runtime_prop
     device_config_boot_count_prop
     device_config_reset_performed_prop
     device_config_netd_native_prop
     dnsresolver_service
+    drm_service_config_prop
     exfat
     exported2_config_prop
     exported2_default_prop
@@ -67,6 +83,8 @@
     exported_vold_prop
     exported_wifi_prop
     fastbootd
+    ffs_config_prop
+    ffs_control_prop
     flags_health_check
     flags_health_check_exec
     fingerprint_vendor_data_file
@@ -84,25 +102,33 @@
     hal_usb_gadget_hwservice
     hal_vehicle_hwservice
     hal_wifi_hostapd_hwservice
+    hdmi_config_prop
     heapprofd
     heapprofd_exec
     heapprofd_socket
     incident_helper
     incident_helper_exec
+    init_service_status_private_prop
+    init_service_status_prop
     iorapd
     iorapd_data_file
     iorapd_exec
     iorapd_service
     iorapd_tmpfs
+    keyguard_config_prop
     last_boot_reason_prop
+    libc_debug_prop
     llkd
     llkd_exec
     llkd_prop
     llkd_tmpfs
+    lmkd_config_prop
     looper_stats_service
     lowpan_device
     lowpan_prop
     lowpan_service
+    media_config_prop
+    mediadrm_config_prop
     mediaextractor_update_service
     mediaswcodec
     mediaswcodec_exec
@@ -115,21 +141,26 @@
     network_stack_service
     network_watchlist_data_file
     network_watchlist_service
+    oem_unlock_prop
     overlayfs_file
+    packagemanager_config_prop
     perfetto
     perfetto_exec
     perfetto_tmpfs
     perfetto_traces_data_file
     property_info
+    provisioned_prop
+    recovery_config_prop
     recovery_socket
+    retaildemo_prop
     role_service
     runas_app
-    art_apex_dir
     runtime_service
     secure_element
     secure_element_device
     secure_element_service
     secure_element_tmpfs
+    sendbug_config_prop
     server_configurable_flags_data_file
     simpleperf_app_runner
     simpleperf_app_runner_exec
@@ -147,14 +178,21 @@
     statsdw_socket
     storaged_data_file
     super_block_device
+    surfaceflinger_color_prop
+    surfaceflinger_prop
     staging_data_file
+    storagemanager_config_prop
     system_boot_reason_prop
     system_bootstrap_lib_file
     system_lmk_prop
     system_update_service
+    systemsound_config_prop
+    telephony_config_prop
+    telephony_status_prop
     test_boot_reason_prop
     time_prop
     timedetector_service
+    tombstone_config_prop
     tombstone_wifi_data_file
     trace_data_file
     traced
@@ -171,6 +209,8 @@
     untrusted_app_all_devpts
     update_engine_log_data_file
     uri_grants_service
+    usb_config_prop
+    usb_control_prop
     usbd
     usbd_exec
     usbd_tmpfs
@@ -181,20 +221,28 @@
     vendor_shell
     vendor_socket_hook_prop
     vndk_prop
+    vold_config_prop
     vold_metadata_file
     vold_prepare_subdirs
     vold_prepare_subdirs_exec
     vold_service
+    vold_status_prop
     vrflinger_vsync_service
+    vts_config_prop
+    vts_status_prop
     wait_for_keymaster
     wait_for_keymaster_exec
     wait_for_keymaster_tmpfs
     watchdogd_tmpfs
+    wifi_config_prop
+    wifi_hal_prop
     wm_trace_data_file
     wpantund
     wpantund_exec
     wpantund_service
-    wpantund_tmpfs))
+    wpantund_tmpfs
+    zram_config_prop
+    zram_control_prop))
 
 ;; private_objects - a collection of types that were labeled differently in
 ;;     older policy, but that should not remain accessible to vendor policy.
