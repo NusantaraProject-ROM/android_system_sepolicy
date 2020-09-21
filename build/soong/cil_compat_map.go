@@ -132,6 +132,12 @@ func (c *cilCompatMap) GenerateAndroidBuildActions(ctx android.ModuleContext) {
 		}
 	}
 
+	// This logic was required in order to skip generating empty cil mapping files
+	// See b/168344424 for more details
+	if len(srcFiles) == 0 {
+		return
+	}
+
 	bottomHalf := android.PathForModuleGen(ctx, "bottom_half")
 	ctx.Build(pctx, android.BuildParams{
 		Rule:   android.Cat,

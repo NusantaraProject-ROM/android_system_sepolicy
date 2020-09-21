@@ -172,6 +172,9 @@ allow zygote tmpfs:dir r_dir_perms;
 
 allow zygote same_process_hal_file:file { execute read open getattr map };
 
+# Allow the zygote to access storage properties to check if sdcardfs is enabled.
+get_prop(zygote, storage_config_prop);
+
 # Let the zygote access overlays so it can initialize the AssetManager.
 get_prop(zygote, overlay_prop)
 get_prop(zygote, exported_overlay_prop)
@@ -199,6 +202,12 @@ unix_socket_send(zygote, system_unsolzygote, system_server)
 
 # Allow zygote to access media_variant_prop for static initialization
 get_prop(zygote, media_variant_prop)
+
+# Allow zygote to read ro.control_privapp_permissions and ro.cp_system_other_odex
+get_prop(zygote, packagemanager_config_prop)
+
+# Allow zygote to read /apex/apex-info-list.xml
+allow zygote apex_info_file:file r_file_perms;
 
 ###
 ### neverallow rules

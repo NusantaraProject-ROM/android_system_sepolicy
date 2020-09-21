@@ -46,10 +46,6 @@ allow priv_app radio_service:service_manager find;
 allow priv_app recovery_service:service_manager find;
 allow priv_app stats_service:service_manager find;
 
-# Allow privileged apps to interact with gpuservice
-binder_call(priv_app, gpuservice)
-allow priv_app gpu_service:service_manager find;
-
 # Write to /cache.
 allow priv_app { cache_file cache_recovery_file }:dir create_dir_perms;
 allow priv_app { cache_file cache_recovery_file }:file create_file_perms;
@@ -138,8 +134,7 @@ dontaudit priv_app sysfs:dir read;
 dontaudit priv_app sysfs:file read;
 dontaudit priv_app sysfs_android_usb:file read;
 dontaudit priv_app sysfs_dm:file r_file_perms;
-dontaudit priv_app wifi_prop:file read;
-dontaudit priv_app { wifi_prop exported_wifi_prop }:file read;
+dontaudit priv_app { wifi_prop wifi_hal_prop }:file read;
 
 # allow privileged apps to use UDP sockets provided by the system server but not
 # modify them other than to connect
@@ -160,6 +155,9 @@ allowxperm priv_app incremental_control_file:file ioctl INCFS_IOCTL_PERMIT_FILL;
 # Required for Phonesky to be able to read APEX files under /data/apex/active/.
 allow priv_app apex_data_file:dir search;
 allow priv_app staging_data_file:file r_file_perms;
+
+# allow priv app to access the system app data files for ContentProvider case.
+allow priv_app system_app_data_file:file { read getattr };
 
 ###
 ### neverallow rules
