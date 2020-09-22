@@ -91,35 +91,46 @@ attribute extended_core_property_type;
 
 # All properties defined by /system.
 attribute system_property_type;
+expandattribute system_property_type false;
 
 # All /system-defined properties used only in /system.
 attribute system_internal_property_type;
+expandattribute system_internal_property_type false;
 
 # All /system-defined properties which can't be written outside /system.
 attribute system_restricted_property_type;
+expandattribute system_restricted_property_type false;
 
 # All /system-defined properties with no restrictions.
 attribute system_public_property_type;
+expandattribute system_public_property_type false;
+
+# All keystore2_key labels.
+attribute keystore2_key_type;
 
 # All properties defined by /product.
 # Currently there are no enforcements between /system and /product, so for now
 # /product attributes are just replaced to /system attributes.
 define(`product_property_type',   `system_property_type')
-define(`product_internal_type',   `system_internal_property_type')
-define(`product_restricted_type', `system_restricted_property_type')
-define(`product_public_type',     `system_public_property_type')
+define(`product_internal_property_type',   `system_internal_property_type')
+define(`product_restricted_property_type', `system_restricted_property_type')
+define(`product_public_property_type',     `system_public_property_type')
 
 # All properties defined by /vendor.
 attribute vendor_property_type;
+expandattribute vendor_property_type false;
 
 # All /vendor-defined properties used only in /vendor.
 attribute vendor_internal_property_type;
+expandattribute vendor_internal_property_type false;
 
 # All /vendor-defined properties which can't be written outside /vendor.
 attribute vendor_restricted_property_type;
+expandattribute vendor_restricted_property_type false;
 
 # All /vendor-defined properties with no restrictions.
 attribute vendor_public_property_type;
+expandattribute vendor_public_property_type false;
 
 # All service_manager types created by system_server
 attribute system_server_service;
@@ -196,11 +207,6 @@ attribute coredomain;
 # All socket devices owned by core domain components
 attribute coredomain_socket;
 expandattribute coredomain_socket false;
-
-# All vendor domains which violate the requirement of not using Binder
-# TODO(b/35870313): Remove this once there are no violations
-attribute binder_in_vendor_violators;
-expandattribute binder_in_vendor_violators false;
 
 # All vendor domains which violate the requirement of not using sockets for
 # communicating with core components

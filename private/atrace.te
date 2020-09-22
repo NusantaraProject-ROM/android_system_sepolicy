@@ -1,7 +1,6 @@
 # Domain for atrace process.
 # It is spawned either by traced_probes or by init for the boottrace service.
 
-type atrace, domain, coredomain;
 type atrace_exec, exec_type, file_type, system_file_type;
 
 # boottrace services uses /data/misc/boottrace/categories
@@ -59,7 +58,7 @@ userdebug_or_eng(`
   hal_client_domain(atrace, hal_vibrator)
 ')
 
-# Remove logspam from notification attempts to non-whitelisted services.
+# Remove logspam from notification attempts to non-allowlisted services.
 dontaudit atrace hwservice_manager_type:hwservice_manager find;
 dontaudit atrace service_manager_type:service_manager find;
 dontaudit atrace domain:binder call;

@@ -140,8 +140,6 @@ compatible_property_only(`
     exported_default_prop
     exported_dumpstate_prop
     exported_system_prop
-    exported2_default_prop
-    exported2_system_prop
     exported3_system_prop
     usb_control_prop
     -nfc_prop
@@ -165,7 +163,7 @@ compatible_property_only(`
     -hal_telephony_server
     -vendor_init
   } {
-    exported3_radio_prop
+    radio_control_prop
   }:property_service set;
 
   neverallow {
@@ -236,7 +234,6 @@ compatible_property_only(`
     core_property_type
     dalvik_config_prop
     extended_core_property_type
-    exported2_system_prop
     exported3_system_prop
     systemsound_config_prop
     -debug_prop
@@ -456,3 +453,10 @@ neverallow {
   -dumpstate
   -appdomain
 } camera_calibration_prop:file no_rw_file_perms;
+
+neverallow {
+  -init
+  -dumpstate
+  -hal_dumpstate_server
+  not_compatible_property(`-vendor_init')
+} hal_dumpstate_config_prop:file no_rw_file_perms;

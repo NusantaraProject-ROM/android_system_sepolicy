@@ -10,6 +10,7 @@ get_prop(coredomain, init_service_status_private_prop)
 get_prop(coredomain, lmkd_config_prop)
 get_prop(coredomain, localization_prop)
 get_prop(coredomain, pm_prop)
+get_prop(coredomain, radio_control_prop)
 get_prop(coredomain, storagemanager_config_prop)
 get_prop(coredomain, surfaceflinger_color_prop)
 get_prop(coredomain, systemsound_config_prop)
@@ -34,7 +35,7 @@ neverallow {
 ')
 
 # On TREBLE devices, a limited set of files in /vendor are accessible to
-# only a few whitelisted coredomains to keep system/vendor separation.
+# only a few allowlisted coredomains to keep system/vendor separation.
 full_treble_only(`
     # Limit access to /vendor/app
     neverallow {
@@ -63,6 +64,7 @@ full_treble_only(`
         -init
         -installd
         userdebug_or_eng(`-heapprofd')
+        userdebug_or_eng(`-profcollectd')
         -postinstall_dexopt
         -rs # spawned by appdomain, so carryover the exception above
         -system_server
@@ -109,6 +111,7 @@ full_treble_only(`
         -webview_zygote
         -zygote
         userdebug_or_eng(`-heapprofd')
+        userdebug_or_eng(`-profcollectd')
     } vendor_overlay_file:file open;
 ')
 
@@ -158,6 +161,7 @@ full_treble_only(`
     -shell
     -system_server
     -traceur_app
+    userdebug_or_eng(`-profcollectd')
   } debugfs_tracing:file no_rw_file_perms;
 
   # inotifyfs
