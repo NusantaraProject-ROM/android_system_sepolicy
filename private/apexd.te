@@ -37,6 +37,7 @@ allowxperm apexd loop_device:blk_file ioctl {
   LOOP_SET_DIRECT_IO
   LOOP_CLR_FD
   BLKFLSBUF
+  LOOP_CONFIGURE
 };
 # allow apexd to access /dev/block
 allow apexd block_device:dir r_dir_perms;
@@ -133,6 +134,9 @@ domain_auto_trans(apexd, art_apex_postinstall_exec, art_apex_postinstall)
 userdebug_or_eng(`
   domain_auto_trans(apexd, apex_test_prepostinstall_exec, apex_test_prepostinstall)
 ')
+
+# Allow transition to GKI update pre/post install domain
+domain_auto_trans(apexd, gki_apex_prepostinstall_exec, gki_apex_prepostinstall)
 
 # Allow apexd to be invoked with logwrapper from init during userspace reboot.
 allow apexd devpts:chr_file { read write };

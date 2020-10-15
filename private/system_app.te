@@ -44,7 +44,6 @@ set_prop(system_app, debug_prop)
 set_prop(system_app, system_prop)
 set_prop(system_app, exported_bluetooth_prop)
 set_prop(system_app, exported_system_prop)
-set_prop(system_app, exported2_system_prop)
 set_prop(system_app, exported3_system_prop)
 set_prop(system_app, logd_prop)
 set_prop(system_app, net_radio_prop)
@@ -134,6 +133,16 @@ allow system_app keystore:keystore_key {
     duplicate
     clear_uid
     user_changed
+};
+
+allow system_app keystore:keystore2_key {
+    delete
+    get_info
+    grant
+    list
+    rebind
+    update
+    use
 };
 
 # settings app reads /proc/version
