@@ -566,6 +566,9 @@ allow system_server system_server:process setfscreate;
 # Relabel apk files.
 allow system_server { apk_tmp_file apk_private_tmp_file }:{ dir file } { relabelfrom relabelto };
 allow system_server { apk_data_file apk_private_data_file }:{ dir file } { relabelfrom relabelto };
+# Allow PackageManager to rename file from /data/app-staging folder to /data/app during
+# staged apk install.
+allow system_server { staging_data_file }:{ dir file } { relabelfrom };
 
 # Relabel wallpaper.
 allow system_server system_data_file:file relabelfrom;
@@ -837,7 +840,6 @@ allow system_server keystore:keystore2_key {
 	use_dev_id
 	grant
 	get_info
-	list
 	rebind
 	update
 	use
@@ -932,6 +934,9 @@ r_dir_file(system_server, cgroup)
 allow system_server ion_device:chr_file r_file_perms;
 allow system_server cgroup_v2:dir rw_dir_perms;
 allow system_server cgroup_v2:file rw_file_perms;
+
+# Access to /dev/dma_heap/system
+allow system_server dmabuf_system_heap_device:chr_file r_file_perms;
 
 r_dir_file(system_server, proc_asound)
 r_dir_file(system_server, proc_net_type)

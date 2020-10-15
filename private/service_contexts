@@ -1,8 +1,10 @@
+android.hardware.biometrics.face.IFace/default                       u:object_r:hal_face_service:s0
 android.hardware.biometrics.fingerprint.IFingerprint/default         u:object_r:hal_fingerprint_service:s0
+android.hardware.gnss.IGnss/default                                  u:object_r:hal_gnss_service:s0
 android.hardware.identity.IIdentityCredentialStore/default           u:object_r:hal_identity_service:s0
 android.hardware.light.ILights/default                               u:object_r:hal_light_service:s0
 android.hardware.power.IPower/default                                u:object_r:hal_power_service:s0
-android.hardware.powerstats.IPowerStats/default                      u:object_r:hal_power_stats_service:s0
+android.hardware.power.stats.IPowerStats/default                      u:object_r:hal_power_stats_service:s0
 android.hardware.rebootescrow.IRebootEscrow/default                  u:object_r:hal_rebootescrow_service:s0
 android.hardware.vibrator.IVibrator/default                          u:object_r:hal_vibrator_service:s0
 
@@ -18,8 +20,8 @@ android.os.UpdateEngineService            u:object_r:update_engine_service:s0
 android.os.UpdateEngineStableService      u:object_r:update_engine_stable_service:s0
 android.security.identity                 u:object_r:credstore_service:s0
 android.security.keystore                 u:object_r:keystore_service:s0
-android.security.keystore2                u:object_r:keystore_service:s0
 android.service.gatekeeper.IGateKeeperService    u:object_r:gatekeeper_service:s0
+android.system.keystore2                  u:object_r:keystore_service:s0
 app_binding                               u:object_r:app_binding_service:s0
 app_integrity                             u:object_r:app_integrity_service:s0
 app_prediction                            u:object_r:app_prediction_service:s0
@@ -68,6 +70,7 @@ device_config                             u:object_r:device_config_service:s0
 device_policy                             u:object_r:device_policy_service:s0
 device_identifiers                        u:object_r:device_identifiers_service:s0
 deviceidle                                u:object_r:deviceidle_service:s0
+device_state                              u:object_r:device_state_service:s0
 devicestoragemonitor                      u:object_r:devicestoragemonitor_service:s0
 diskstats                                 u:object_r:diskstats_service:s0
 display                                   u:object_r:display_service:s0
@@ -149,6 +152,7 @@ media_session                             u:object_r:media_session_service:s0
 meminfo                                   u:object_r:meminfo_service:s0
 midi                                      u:object_r:midi_service:s0
 mount                                     u:object_r:mount_service:s0
+music_recognition                         u:object_r:music_recognition_service:s0
 netd                                      u:object_r:netd_service:s0
 netpolicy                                 u:object_r:netpolicy_service:s0
 netstats                                  u:object_r:netstats_service:s0
@@ -241,6 +245,7 @@ usagestats                                u:object_r:usagestats_service:s0
 usb                                       u:object_r:usb_service:s0
 user                                      u:object_r:user_service:s0
 vibrator                                  u:object_r:vibrator_service:s0
+vibrator_manager                          u:object_r:vibrator_manager_service:s0
 virtual_touchpad                          u:object_r:virtual_touchpad_service:s0
 voiceinteraction                          u:object_r:voiceinteraction_service:s0
 vold                                      u:object_r:vold_service:s0

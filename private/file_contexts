@@ -92,6 +92,7 @@
 /dev/bus/usb(.*)?       u:object_r:usb_device:s0
 /dev/console		u:object_r:console_device:s0
 /dev/cpu_variant:.*     u:object_r:dev_cpu_variant:s0
+/dev/dma_heap/system    u:object_r:dmabuf_system_heap_device:s0
 /dev/device-mapper	u:object_r:dm_device:s0
 /dev/eac		u:object_r:audio_device:s0
 /dev/event-log-tags     u:object_r:runtime_event_log_tags_file:s0
@@ -258,7 +259,6 @@
 /system/bin/installd	u:object_r:installd_exec:s0
 /system/bin/otapreopt_chroot   u:object_r:otapreopt_chroot_exec:s0
 /system/bin/otapreopt_slot   u:object_r:otapreopt_slot_exec:s0
-/system/bin/art_apex_boot_integrity   u:object_r:art_apex_boot_integrity_exec:s0
 /system/bin/credstore	u:object_r:credstore_exec:s0
 /system/bin/keystore	u:object_r:keystore_exec:s0
 /system/bin/keystore2	u:object_r:keystore_exec:s0
@@ -574,6 +574,7 @@
 /data/misc/net(/.*)?            u:object_r:net_data_file:s0
 /data/misc/network_watchlist(/.*)? u:object_r:network_watchlist_data_file:s0
 /data/misc/perfetto-traces(/.*)? u:object_r:perfetto_traces_data_file:s0
+/data/misc/perfetto-configs(/.*)? u:object_r:perfetto_configs_data_file:s0
 /data/misc/prereboot(/.*)?      u:object_r:prereboot_data_file:s0
 /data/misc/profcollectd(/.*)?   u:object_r:profcollectd_data_file:s0
 /data/misc/recovery(/.*)?       u:object_r:recovery_data_file:s0

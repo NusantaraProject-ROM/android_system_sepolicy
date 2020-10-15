@@ -52,10 +52,24 @@ PLAT_PUBLIC_POLICY := $(LOCAL_PATH)/public
 PLAT_PRIVATE_POLICY := $(LOCAL_PATH)/private
 PLAT_VENDOR_POLICY := $(LOCAL_PATH)/vendor
 REQD_MASK_POLICY := $(LOCAL_PATH)/reqd_mask
-SYSTEM_EXT_PUBLIC_POLICY := $(BOARD_PLAT_PUBLIC_SEPOLICY_DIR)
-SYSTEM_EXT_PRIVATE_POLICY := $(BOARD_PLAT_PRIVATE_SEPOLICY_DIR)
+
+SYSTEM_EXT_PUBLIC_POLICY := $(SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS)
+ifneq (,$(BOARD_PLAT_PUBLIC_SEPOLICY_DIR))
+  # TODO: Disallow BOARD_PLAT_*
+  SYSTEM_EXT_PUBLIC_POLICY += $(BOARD_PLAT_PUBLIC_SEPOLICY_DIR)
+endif
+SYSTEM_EXT_PRIVATE_POLICY := $(SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS)
+ifneq (,$(BOARD_PLAT_PRIVATE_SEPOLICY_DIR))
+  # TODO: Disallow BOARD_PLAT_*
+  SYSTEM_EXT_PRIVATE_POLICY += $(BOARD_PLAT_PRIVATE_SEPOLICY_DIR)
+endif
+
 PRODUCT_PUBLIC_POLICY := $(PRODUCT_PUBLIC_SEPOLICY_DIRS)
 PRODUCT_PRIVATE_POLICY := $(PRODUCT_PRIVATE_SEPOLICY_DIRS)
+
+# Extra sepolicy and prebuilts directories for sepolicy_freeze_test
+FREEZE_TEST_EXTRA_DIRS := $(SEPOLICY_FREEZE_TEST_EXTRA_DIRS)
+FREEZE_TEST_EXTRA_PREBUILT_DIRS := $(SEPOLICY_FREEZE_TEST_EXTRA_PREBUILT_DIRS)
 
 ifneq (,$(SYSTEM_EXT_PUBLIC_POLICY)$(SYSTEM_EXT_PRIVATE_POLICY))
 HAS_SYSTEM_EXT_SEPOLICY_DIR := true
@@ -314,7 +328,94 @@ ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
 LOCAL_REQUIRED_MODULES += \
     sepolicy_freeze_test \
 
+else
+ifneq (,$(FREEZE_TEST_EXTRA_DIRS)$(FREEZE_TEST_EXTRA_PREBUILT_DIRS))
+$(error SEPOLICY_FREEZE_TEST_EXTRA_DIRS or SEPOLICY_FREEZE_TEST_EXTRA_PREBUILT_DIRS\
+cannot be set before system/sepolicy freezes.)
+endif #  (,$(FREEZE_TEST_EXTRA_DIRS)$(FREEZE_TEST_EXTRA_PREBUILT_DIRS))
 endif # ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
+
+include $(BUILD_PHONY_PACKAGE)
+
+#################################
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := selinux_policy_system_ext
+# Include precompiled policy, unless told otherwise.
+ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
+LOCAL_REQUIRED_MODULES += system_ext_sepolicy_and_mapping.sha256
+endif
+
+ifdef HAS_SYSTEM_EXT_SEPOLICY
+LOCAL_REQUIRED_MODULES += system_ext_sepolicy.cil
+endif
+
+ifdef HAS_SYSTEM_EXT_PUBLIC_SEPOLICY
+LOCAL_REQUIRED_MODULES += \
+    system_ext_mapping_file
+
+system_ext_compat_files := $(call build_policy, $(sepolicy_compat_files), $(SYSTEM_EXT_PRIVATE_POLICY))
+
+LOCAL_REQUIRED_MODULES += $(addprefix system_ext_, $(notdir $(system_ext_compat_files)))
+
+endif
+
+ifdef HAS_SYSTEM_EXT_SEPOLICY_DIR
+LOCAL_REQUIRED_MODULES += \
+    system_ext_file_contexts \
+    system_ext_file_contexts_test \
+    system_ext_hwservice_contexts \
+    system_ext_hwservice_contexts_test \
+    system_ext_property_contexts \
+    system_ext_property_contexts_test \
+    system_ext_seapp_contexts \
+    system_ext_service_contexts \
+    system_ext_service_contexts_test \
+    system_ext_mac_permissions.xml \
+
+endif
+
+include $(BUILD_PHONY_PACKAGE)
+
+#################################
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := selinux_policy_product
+# Include precompiled policy, unless told otherwise.
+ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
+LOCAL_REQUIRED_MODULES += product_sepolicy_and_mapping.sha256
+endif
+
+ifdef HAS_PRODUCT_SEPOLICY
+LOCAL_REQUIRED_MODULES += product_sepolicy.cil
+endif
+
+ifdef HAS_PRODUCT_PUBLIC_SEPOLICY
+LOCAL_REQUIRED_MODULES += \
+    product_mapping_file
+
+product_compat_files := $(call build_policy, $(sepolicy_compat_files), $(PRODUCT_PRIVATE_POLICY))
+
+LOCAL_REQUIRED_MODULES += $(addprefix product_, $(notdir $(product_compat_files)))
+
+endif
+
+ifdef HAS_PRODUCT_SEPOLICY_DIR
+LOCAL_REQUIRED_MODULES += \
+    product_file_contexts \
+    product_file_contexts_test \
+    product_hwservice_contexts \
+    product_hwservice_contexts_test \
+    product_property_contexts \
+    product_property_contexts_test \
+    product_seapp_contexts \
+    product_service_contexts \
+    product_service_contexts_test \
+    product_mac_permissions.xml \
+
+endif
 
 include $(BUILD_PHONY_PACKAGE)
 
@@ -329,9 +430,7 @@ LOCAL_REQUIRED_MODULES += \
     precompiled_sepolicy \
     precompiled_sepolicy.plat_sepolicy_and_mapping.sha256 \
     precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256 \
-    system_ext_sepolicy_and_mapping.sha256 \
     precompiled_sepolicy.product_sepolicy_and_mapping.sha256 \
-    product_sepolicy_and_mapping.sha256 \
 
 endif # ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
 
@@ -368,63 +467,8 @@ LOCAL_REQUIRED_MODULES += \
     odm_mac_permissions.xml
 endif
 
-ifdef HAS_SYSTEM_EXT_SEPOLICY
-LOCAL_REQUIRED_MODULES += system_ext_sepolicy.cil
-endif
-
-ifdef HAS_SYSTEM_EXT_PUBLIC_SEPOLICY
-LOCAL_REQUIRED_MODULES += \
-    system_ext_mapping_file
-
-system_ext_compat_files := $(call build_policy, $(sepolicy_compat_files), $(SYSTEM_EXT_PRIVATE_POLICY))
-
-LOCAL_REQUIRED_MODULES += $(addprefix system_ext_, $(notdir $(system_ext_compat_files)))
-
-endif
-
-ifdef HAS_SYSTEM_EXT_SEPOLICY_DIR
-LOCAL_REQUIRED_MODULES += \
-    system_ext_file_contexts \
-    system_ext_file_contexts_test \
-    system_ext_hwservice_contexts \
-    system_ext_hwservice_contexts_test \
-    system_ext_property_contexts \
-    system_ext_property_contexts_test \
-    system_ext_seapp_contexts \
-    system_ext_service_contexts \
-    system_ext_service_contexts_test \
-    system_ext_mac_permissions.xml \
-
-endif
-
-ifdef HAS_PRODUCT_SEPOLICY
-LOCAL_REQUIRED_MODULES += product_sepolicy.cil
-endif
-
-ifdef HAS_PRODUCT_PUBLIC_SEPOLICY
-LOCAL_REQUIRED_MODULES += \
-    product_mapping_file
-
-product_compat_files := $(call build_policy, $(sepolicy_compat_files), $(PRODUCT_PRIVATE_POLICY))
-
-LOCAL_REQUIRED_MODULES += $(addprefix product_, $(notdir $(product_compat_files)))
-
-endif
-
-ifdef HAS_PRODUCT_SEPOLICY_DIR
-LOCAL_REQUIRED_MODULES += \
-    product_file_contexts \
-    product_file_contexts_test \
-    product_hwservice_contexts \
-    product_hwservice_contexts_test \
-    product_property_contexts \
-    product_property_contexts_test \
-    product_seapp_contexts \
-    product_service_contexts \
-    product_service_contexts_test \
-    product_mac_permissions.xml \
-
-endif
+LOCAL_REQUIRED_MODULES += selinux_policy_system_ext
+LOCAL_REQUIRED_MODULES += selinux_policy_product
 
 LOCAL_REQUIRED_MODULES += \
     selinux_denial_metadata \
@@ -1402,13 +1446,15 @@ include $(BUILD_SYSTEM)/base_rules.mk
 # The file_contexts.bin is built in the following way:
 # 1. Collect all file_contexts files in THIS repository and process them with
 #    m4 into a tmp file called file_contexts.local.tmp.
-# 2. Collect all device specific file_contexts files and process them with m4
+# 2. Collect all file_contexts files from LOCAL_FILE_CONTEXTS of installed
+#    modules with m4 with a tmp file called file_contexts.modules.tmp.
+# 3. Collect all device specific file_contexts files and process them with m4
 #    into a tmp file called file_contexts.device.tmp.
-# 3. Run checkfc -e (allow no device fc entries ie empty) and fc_sort on
+# 4. Run checkfc -e (allow no device fc entries ie empty) and fc_sort on
 #    file_contexts.device.tmp and output to file_contexts.device.sorted.tmp.
-# 4. Concatenate file_contexts.local.tmp and file_contexts.device.tmp into
-#    file_contexts.concat.tmp.
-# 5. Run checkfc and sefcontext_compile on file_contexts.concat.tmp to produce
+# 5. Concatenate file_contexts.local.tmp, file_contexts.modules.tmp and
+#    file_contexts.device.tmp into file_contexts.concat.tmp.
+# 6. Run checkfc and sefcontext_compile on file_contexts.concat.tmp to produce
 #    file_contexts.bin.
 #
 #  Note: That a newline file is placed between each file_context file found to
@@ -1431,21 +1477,12 @@ ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
   local_fc_files += $(wildcard $(addsuffix /file_contexts_overlayfs, $(PLAT_PRIVATE_POLICY)))
 endif
 
-# Even if TARGET_FLATTEN_APEX is not turned on, "flattened" APEXes are installed
-$(foreach _tuple,$(APEX_FILE_CONTEXTS_INFOS),\
-  $(eval _apex_name := $(call word-colon,1,$(_tuple)))\
-  $(eval _apex_path := $(call word-colon,2,$(_tuple)))\
-  $(eval _fc_path := $(call word-colon,3,$(_tuple)))\
-  $(eval _input := $(_fc_path))\
-  $(eval _output := $(intermediates)/$(_apex_name)-flattened)\
-  $(eval $(call build_flattened_apex_file_contexts,$(_input),$(_apex_path),$(_output),local_fc_files))\
-  )
-
 file_contexts.local.tmp := $(intermediates)/file_contexts.local.tmp
-$(file_contexts.local.tmp): PRIVATE_FC_FILES := $(local_fc_files)
-$(file_contexts.local.tmp): $(local_fc_files) $(M4)
-	@mkdir -p $(dir $@)
-	$(hide) $(M4) --fatal-warnings -s $(PRIVATE_FC_FILES) > $@
+$(call merge-fc-files,$(local_fc_files),$(file_contexts.local.tmp))
+
+# The rule for file_contexts.modules.tmp is defined in build/make/core/Makefile.
+# it gathers LOCAL_FILE_CONTEXTS from product_MODULES
+file_contexts.modules.tmp := $(intermediates)/file_contexts.modules.tmp
 
 device_fc_files := $(call build_vendor_policy, file_contexts)
 
@@ -1469,10 +1506,9 @@ $(file_contexts.device.sorted.tmp): $(file_contexts.device.tmp) $(built_sepolicy
 	$(hide) $(HOST_OUT_EXECUTABLES)/fc_sort -i $< -o $@
 
 file_contexts.concat.tmp := $(intermediates)/file_contexts.concat.tmp
-$(file_contexts.concat.tmp): PRIVATE_CONTEXTS := $(file_contexts.local.tmp) $(file_contexts.device.sorted.tmp)
-$(file_contexts.concat.tmp): $(file_contexts.local.tmp) $(file_contexts.device.sorted.tmp) $(M4)
-	@mkdir -p $(dir $@)
-	$(hide) $(M4) --fatal-warnings -s $(PRIVATE_CONTEXTS) > $@
+$(call merge-fc-files,\
+  $(file_contexts.local.tmp) $(file_contexts.modules.tmp) $(file_contexts.device.sorted.tmp),\
+  $(file_contexts.concat.tmp))
 
 $(LOCAL_BUILT_MODULE): PRIVATE_SEPOLICY := $(built_sepolicy)
 $(LOCAL_BUILT_MODULE): $(file_contexts.concat.tmp) $(built_sepolicy) $(HOST_OUT_EXECUTABLES)/sefcontext_compile $(HOST_OUT_EXECUTABLES)/checkfc
@@ -1489,6 +1525,7 @@ file_contexts.concat.tmp :=
 file_contexts.device.sorted.tmp :=
 file_contexts.device.tmp :=
 file_contexts.local.tmp :=
+file_contexts.modules.tmp :=
 
 ##################################
 include $(CLEAR_VARS)
@@ -1676,6 +1713,11 @@ LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SYSTEM)/base_rules.mk
 
+define ziplist
+$(if $(and $1,$2), "$(firstword $1) $(firstword $2)"\
+  $(call ziplist,$(wordlist 2,$(words $1),$1),$(wordlist 2,$(words $2),$2)))
+endef
+
 base_plat_public := $(LOCAL_PATH)/public
 base_plat_private := $(LOCAL_PATH)/private
 base_plat_public_prebuilt := \
@@ -1690,10 +1732,16 @@ $(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC := $(base_plat_public)
 $(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE := $(base_plat_private)
 $(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC_PREBUILT := $(base_plat_public_prebuilt)
 $(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE_PREBUILT := $(base_plat_private_prebuilt)
+$(LOCAL_BUILT_MODULE): PRIVATE_EXTRA := $(sort $(FREEZE_TEST_EXTRA_DIRS))
+$(LOCAL_BUILT_MODULE): PRIVATE_EXTRA_PREBUILT := $(sort $(FREEZE_TEST_EXTRA_PREBUILT_DIRS))
 $(LOCAL_BUILT_MODULE): $(all_frozen_files)
 ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
 	@diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PUBLIC_PREBUILT) $(PRIVATE_BASE_PLAT_PUBLIC)
 	@diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PRIVATE_PREBUILT) $(PRIVATE_BASE_PLAT_PRIVATE)
+ifneq (,$(FREEZE_TEST_EXTRA_DIRS)$(FREEZE_TEST_EXTRA_PREBUILT_DIRS))
+	@for pair in $(call ziplist, $(PRIVATE_EXTRA_PREBUILT), $(PRIVATE_EXTRA)); \
+		do diff -rq -x bug_map $$pair; done
+endif # (,$(FREEZE_TEST_EXTRA_DIRS)$(FREEZE_TEST_EXTRA_PREBUILT_DIRS))
 endif # ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
 	$(hide) touch $@
 
