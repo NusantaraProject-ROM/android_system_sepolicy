@@ -115,6 +115,9 @@ selinux.restorecon_recursive   u:object_r:restorecon_prop:s0
 vold.                   u:object_r:vold_prop:s0
 ro.crypto.              u:object_r:vold_prop:s0
 
+# TODO(b/141677108): Remove once true everywhere
+ro.vold.level_from_user          u:object_r:vold_config_prop:s0
+
 # ro.build.fingerprint is either set in /system/build.prop, or is
 # set at runtime by system_server.
 ro.build.fingerprint    u:object_r:fingerprint_prop:s0 exact string
@@ -235,8 +238,9 @@ sys.boot_from_charger_mode  u:object_r:charger_status_prop:s0 exact int
 ro.enable_boot_charger_mode u:object_r:charger_config_prop:s0 exact bool
 
 # Virtual A/B properties
-ro.virtual_ab.enabled   u:object_r:virtual_ab_prop:s0
-ro.virtual_ab.retrofit  u:object_r:virtual_ab_prop:s0
+ro.virtual_ab.enabled   u:object_r:virtual_ab_prop:s0 exact bool
+ro.virtual_ab.retrofit  u:object_r:virtual_ab_prop:s0 exact bool
+ro.virtual_ab.compression.enabled  u:object_r:virtual_ab_prop:s0 exact bool
 
 ro.product.ab_ota_partitions u:object_r:ota_prop:s0 exact string
 # Property to set/clear the warm reset flag after an OTA update.
@@ -706,7 +710,11 @@ ro.boot.slot_suffix          u:object_r:exported_default_prop:s0 exact string
 
 ro.boringcrypto.hwrand u:object_r:exported_default_prop:s0 exact bool
 
-ro.build.ab_update         u:object_r:exported_default_prop:s0 exact string
+# Update related props
+ro.build.ab_update                                u:object_r:exported_default_prop:s0 exact string
+ro.build.ab_update.gki.prevent_downgrade_version  u:object_r:ab_update_gki_prop:s0 exact bool
+ro.build.ab_update.gki.prevent_downgrade_spl      u:object_r:ab_update_gki_prop:s0 exact bool
+
 ro.build.expect.baseband   u:object_r:exported_default_prop:s0 exact string
 ro.build.expect.bootloader u:object_r:exported_default_prop:s0 exact string
 
@@ -834,6 +842,7 @@ ro.surface_flinger.use_smart_90_for_video                 u:object_r:surfaceflin
 ro.surface_flinger.use_content_detection_for_refresh_rate u:object_r:surfaceflinger_prop:s0 exact bool
 ro.surface_flinger.color_space_agnostic_dataspace         u:object_r:surfaceflinger_prop:s0 exact int
 ro.surface_flinger.refresh_rate_switching                 u:object_r:surfaceflinger_prop:s0 exact bool
+ro.surface_flinger.update_device_product_info_on_hotplug_reconnect u:object_r:surfaceflinger_prop:s0 exact bool
 
 ro.sf.disable_triple_buffer u:object_r:surfaceflinger_prop:s0 exact bool
 ro.sf.lcd_density           u:object_r:surfaceflinger_prop:s0 exact int
@@ -862,6 +871,8 @@ cache_key.telephony.                     u:object_r:binder_cache_telephony_serve
 gsm.sim.operator.numeric       u:object_r:telephony_status_prop:s0 exact string
 persist.radio.airplane_mode_on u:object_r:telephony_status_prop:s0 exact bool
 
+ro.cdma.home.operator.alpha       u:object_r:telephony_config_prop:s0 exact string
+ro.cdma.home.operator.numeric     u:object_r:telephony_config_prop:s0 exact string
 ro.com.android.dataroaming        u:object_r:telephony_config_prop:s0 exact bool
 ro.com.android.prov_mobiledata    u:object_r:telephony_config_prop:s0 exact bool
 ro.radio.noril                    u:object_r:telephony_config_prop:s0 exact string

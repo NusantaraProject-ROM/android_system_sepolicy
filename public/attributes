@@ -184,7 +184,7 @@ attribute mlstrustedobject;
 # All domains used for apps.
 attribute appdomain;
 
-# All third party apps.
+# All third party apps (except isolated_app and ephemeral_app)
 attribute untrusted_app_all;
 
 # All domains used for apps with network access.
@@ -203,6 +203,9 @@ attribute update_engine_common;
 
 # All core domains (as opposed to vendor/device-specific domains)
 attribute coredomain;
+
+# All vendor hwservice.
+attribute vendor_hwservice_type;
 
 # All socket devices owned by core domain components
 attribute coredomain_socket;
