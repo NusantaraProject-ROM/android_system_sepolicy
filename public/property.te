@@ -62,6 +62,7 @@ system_restricted_prop(boot_status_prop)
 system_restricted_prop(bootloader_prop)
 system_restricted_prop(boottime_public_prop)
 system_restricted_prop(bq_config_prop)
+system_restricted_prop(build_bootimage_prop)
 system_restricted_prop(build_prop)
 system_restricted_prop(charger_status_prop)
 system_restricted_prop(fingerprint_prop)
@@ -126,6 +127,7 @@ system_vendor_config_prop(exported_camera_prop)
 system_vendor_config_prop(exported_config_prop)
 system_vendor_config_prop(exported_default_prop)
 system_vendor_config_prop(ffs_config_prop)
+system_vendor_config_prop(framework_watchdog_config_prop)
 system_vendor_config_prop(graphics_config_prop)
 system_vendor_config_prop(hdmi_config_prop)
 system_vendor_config_prop(incremental_prop)
@@ -155,6 +157,7 @@ system_vendor_config_prop(vts_config_prop)
 system_vendor_config_prop(vold_config_prop)
 system_vendor_config_prop(wifi_config_prop)
 system_vendor_config_prop(zram_config_prop)
+system_vendor_config_prop(zygote_config_prop)
 
 # Properties with no restrictions
 system_public_prop(audio_prop)
@@ -261,7 +264,13 @@ not_compatible_property(`
     system_public_prop(vold_prop)
 ')
 
-type vendor_default_prop, property_type;
+not_compatible_property(`
+    vendor_public_prop(vendor_default_prop)
+')
+
+compatible_property_only(`
+    vendor_internal_prop(vendor_default_prop)
+')
 
 typeattribute log_prop log_property_type;
 typeattribute log_tag_prop log_property_type;

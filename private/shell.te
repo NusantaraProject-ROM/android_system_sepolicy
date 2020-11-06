@@ -73,6 +73,10 @@ allow shell system_linker_exec:file rx_file_perms;
 # /system/bin/bcc (b/126388046)
 allow shell rs_exec:file rx_file_perms;
 
+# Allow (host-driven) ART run-tests to execute dex2oat, in order to
+# check ART's compiler.
+allow shell dex2oat_exec:file rx_file_perms;
+
 # Allow shell to start and comminicate with lpdumpd.
 set_prop(shell, lpdumpd_prop);
 binder_call(shell, lpdumpd)
@@ -144,6 +148,9 @@ get_prop(shell, system_boot_reason_prop)
 
 # Allow reading the outcome of perf_event_open LSM support test for CTS.
 get_prop(shell, init_perf_lsm_hooks_prop)
+
+# Allow shell to read boot image timestamps and fingerprints.
+get_prop(shell, build_bootimage_prop)
 
 userdebug_or_eng(`set_prop(shell, persist_debug_prop)')
 
