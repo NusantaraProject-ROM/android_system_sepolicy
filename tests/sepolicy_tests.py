@@ -12,7 +12,22 @@ def TestDataTypeViolations(pol):
     return pol.AssertPathTypesHaveAttr(["/data/"], [], "data_file_type")
 
 def TestSystemTypeViolations(pol):
-    return pol.AssertPathTypesHaveAttr(["/system/"], [], "system_file_type")
+    partitions = ["/system/", "/system_ext/", "/product/"]
+    exceptions = [
+        # devices before treble don't have a vendor partition
+        "/system/vendor/",
+
+        # overlay files are mounted over vendor
+        "/product/overlay/",
+        "/product/vendor_overlay/",
+        "/system/overlay/",
+        "/system/product/overlay/",
+        "/system/product/vendor_overlay/",
+        "/system/system_ext/overlay/",
+        "/system_ext/overlay/",
+    ]
+
+    return pol.AssertPathTypesHaveAttr(partitions, exceptions, "system_file_type")
 
 def TestProcTypeViolations(pol):
     return pol.AssertGenfsFilesystemTypesHaveAttr("proc", "proc_type")
@@ -31,11 +46,21 @@ def TestDebugfsTypeViolations(pol):
     return ret
 
 def TestVendorTypeViolations(pol):
-    return pol.AssertPathTypesHaveAttr(["/vendor/"], [], "vendor_file_type")
+    partitions = ["/vendor/", "/odm/"]
+    exceptions = [
+        "/vendor/etc/selinux/",
+        "/vendor/odm/etc/selinux/",
+        "/odm/etc/selinux/",
+    ]
+    return pol.AssertPathTypesHaveAttr(partitions, exceptions, "vendor_file_type")
 
 def TestCoreDataTypeViolations(pol):
     return pol.AssertPathTypesHaveAttr(["/data/"], ["/data/vendor",
             "/data/vendor_ce", "/data/vendor_de"], "core_data_file_type")
+
+def TestPropertyTypeViolations(pol):
+    return pol.AssertPropertyOwnersAreExclusive()
+
 
 ###
 # extend OptionParser to allow the same option flag to be used multiple times.
@@ -62,6 +87,7 @@ Tests = [
     "TestDebugfsTypeViolations",
     "TestVendorTypeViolations",
     "TestCoreDataTypeViolations",
+    "TestPropertyTypeViolations"
 ]
 
 if __name__ == '__main__':
@@ -115,6 +141,8 @@ if __name__ == '__main__':
         results += TestVendorTypeViolations(pol)
     if options.test is None or "TestCoreDataTypeViolations" in options.test:
         results += TestCoreDataTypeViolations(pol)
+    if options.test is None or "TestPropertyTypeViolations" in options.test:
+        results += TestPropertyTypeViolations(pol)
 
     if len(results) > 0:
         sys.exit(results)

@@ -238,12 +238,10 @@ not_full_treble(`
   allow domain system_data_file:dir getattr;
 ')
 allow { coredomain appdomain } system_data_file:dir getattr;
-# /data has the label system_data_root_file. Many components need search
-# permission on system_data_root_file for path traversal.
+# /data has the label system_data_root_file. Vendor components need the search
+# permission on system_data_root_file for path traversal to /data/vendor.
 allow domain system_data_root_file:dir { search getattr } ;
-# Isolated apps have no need to traverse system_data_file dirs
-allow { domain -isolated_app } system_data_file:dir search;
-# Vendor components need access to /dara/vendor
+allow domain system_data_file:dir search;
 # TODO restrict this to non-coredomain
 allow domain vendor_data_file:dir { getattr search };
 
@@ -437,6 +435,10 @@ neverallow * port_device:chr_file ~{ create relabelto unlink setattr getattr };
 neverallow { domain -init } usermodehelper:file { append write };
 neverallow { domain -init -ueventd } sysfs_usermodehelper:file { append write };
 neverallow { domain -init -vendor_init } proc_security:file { append open read write };
+
+# Allow the tracing daemon to use kallsyms to symbolize kernel traces. Addresses are not disclosed,
+# they are repalced with symbol names (if available). Traces don't disclose KASLR.
+neverallow { domain -init -vendor_init -traced_probes } proc_kallsyms:file { open read };
 
 # Init can't do anything with binder calls. If this neverallow rule is being
 # triggered, it's probably due to a service with no SELinux domain.

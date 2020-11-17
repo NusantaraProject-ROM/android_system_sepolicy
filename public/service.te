@@ -144,7 +144,7 @@ type otadexopt_service, system_server_service, service_manager_type;
 type overlay_service, system_api_service, system_server_service, service_manager_type;
 type package_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type package_native_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
-type people_service, system_server_service, service_manager_type;
+type people_service, app_api_service, system_server_service, service_manager_type;
 type permission_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type permissionmgr_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type persistent_data_block_service, system_api_service, system_server_service, service_manager_type;
@@ -175,6 +175,7 @@ type slice_service, app_api_service, system_server_service, service_manager_type
 type statusbar_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type storagestats_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type system_config_service, system_api_service, system_server_service, service_manager_type;
+type system_server_dumper_service, system_api_service, system_server_service, service_manager_type;
 type system_update_service, system_server_service, service_manager_type;
 type soundtrigger_middleware_service, system_server_service, service_manager_type;
 type task_service, system_server_service, service_manager_type;
@@ -195,6 +196,7 @@ type uri_grants_service, app_api_service, ephemeral_app_api_service, system_serv
 type usagestats_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type usb_service, app_api_service, system_server_service, service_manager_type;
 type user_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
+type vcn_management_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type vibrator_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type vibrator_manager_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type voiceinteraction_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
@@ -216,15 +218,16 @@ type emergency_affordance_service, system_server_service, service_manager_type;
 ### HAL Services
 ###
 
-type hal_face_service, vendor_service, service_manager_type;
-type hal_fingerprint_service, vendor_service, service_manager_type;
-type hal_gnss_service, vendor_service, service_manager_type;
-type hal_identity_service, vendor_service, service_manager_type;
-type hal_light_service, vendor_service, service_manager_type;
-type hal_power_service, vendor_service, service_manager_type;
-type hal_power_stats_service, vendor_service, service_manager_type;
-type hal_rebootescrow_service, vendor_service, service_manager_type;
-type hal_vibrator_service, vendor_service, service_manager_type;
+type hal_audiocontrol_service, vendor_service, service_manager_type;
+type hal_face_service, vendor_service, protected_service, service_manager_type;
+type hal_fingerprint_service, vendor_service, protected_service, service_manager_type;
+type hal_gnss_service, vendor_service, protected_service, service_manager_type;
+type hal_identity_service, vendor_service, protected_service, service_manager_type;
+type hal_light_service, vendor_service, protected_service, service_manager_type;
+type hal_power_service, vendor_service, protected_service, service_manager_type;
+type hal_power_stats_service, vendor_service, protected_service, service_manager_type;
+type hal_rebootescrow_service, vendor_service, protected_service, service_manager_type;
+type hal_vibrator_service, vendor_service, protected_service, service_manager_type;
 
 ###
 ### Neverallow rules
