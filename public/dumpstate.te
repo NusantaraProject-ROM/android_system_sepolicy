@@ -76,10 +76,12 @@ allow dumpstate {
 
   # This list comes from hal_interfaces_to_dump in dumputils/dump_utils.c
   hal_audio_server
+  hal_audiocontrol_server
   hal_bluetooth_server
   hal_camera_server
   hal_codec2_server
   hal_drm_server
+  hal_evs_server
   hal_face_server
   hal_fingerprint_server
   hal_graphics_allocator_server
@@ -91,6 +93,7 @@ allow dumpstate {
   hal_power_stats_server
   hal_sensors_server
   hal_thermal_server
+  hal_vehicle_server
   hal_vr_server
   system_suspend_server
 }:process signal;
@@ -139,6 +142,7 @@ binder_call(dumpstate, { appdomain netd wificond })
 dump_hal(hal_dumpstate)
 dump_hal(hal_wifi)
 dump_hal(hal_graphics_allocator)
+dump_hal(hal_light)
 dump_hal(hal_neuralnetworks)
 dump_hal(hal_thermal)
 dump_hal(hal_power)
@@ -167,6 +171,10 @@ allow dumpstate zygote_exec:file rx_file_perms;
 allow dumpstate bluetooth_data_file:dir search;
 allow dumpstate bluetooth_logs_data_file:dir r_dir_perms;
 allow dumpstate bluetooth_logs_data_file:file r_file_perms;
+
+# For Nfc
+allow dumpstate nfc_logs_data_file:dir r_dir_perms;
+allow dumpstate nfc_logs_data_file:file r_file_perms;
 
 # Dumpstate calls screencap, which grabs a screenshot. Needs gpu access
 allow dumpstate gpu_device:chr_file rw_file_perms;
@@ -284,6 +292,9 @@ allow dumpstate proc_pressure_cpu:file r_file_perms;
 allow dumpstate proc_pressure_mem:file r_file_perms;
 allow dumpstate proc_pressure_io:file r_file_perms;
 
+# Allow dumpstate to run ps
+allow dumpstate proc_pid_max:file r_file_perms;
+
 # Allow dumpstate to talk to installd over binder
 binder_call(dumpstate, installd);
 
@@ -335,6 +346,8 @@ allow dumpstate snapshotctl_log_data_file:file r_file_perms;
 #Allow access to /dev/binderfs/binder_logs
 allow dumpstate binderfs_logs:dir r_dir_perms;
 allow dumpstate binderfs_logs:file r_file_perms;
+
+allow dumpstate apex_info_file:file getattr;
 
 ###
 ### neverallow rules

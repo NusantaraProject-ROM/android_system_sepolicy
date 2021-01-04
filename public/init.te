@@ -96,7 +96,7 @@ allow init {
     postinstall_mnt_dir
     mirror_data_file
 }:dir mounton;
-allow init cgroup_bpf:dir { create mounton };
+allow init cgroup_v2:dir { mounton create_dir_perms };
 
 # Mount bpf fs on sys/fs/bpf
 allow init fs_bpf:dir mounton;
@@ -412,6 +412,7 @@ allowxperm init loop_device:blk_file ioctl {
   LOOP_CTL_GET_FREE
   LOOP_SET_BLOCK_SIZE
   LOOP_SET_DIRECT_IO
+  LOOP_GET_STATUS
 };
 
 # Allow init to write to vibrator/trigger
@@ -579,6 +580,7 @@ allow init vold_metadata_file:dir create_dir_perms;
 allow init vold_metadata_file:file getattr;
 allow init metadata_bootstat_file:dir create_dir_perms;
 allow init metadata_bootstat_file:file w_file_perms;
+allow init userspace_reboot_metadata_file:file w_file_perms;
 
 # Allow init to touch PSI monitors
 allow init proc_pressure_mem:file { rw_file_perms setattr };

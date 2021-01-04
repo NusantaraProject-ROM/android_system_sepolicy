@@ -295,6 +295,7 @@ control_logd({ appdomain -ephemeral_app })
 allow appdomain zygote:unix_dgram_socket write;
 
 allow { appdomain -isolated_app -ephemeral_app } keystore:keystore_key { get_state get insert delete exist list sign verify };
+allow { appdomain -isolated_app -ephemeral_app } keystore:keystore2_key { delete use get_info rebind update };
 
 use_keystore({ appdomain -isolated_app -ephemeral_app })
 
@@ -307,6 +308,7 @@ allowxperm { appdomain -bluetooth } self:{ rawip_socket tcp_socket udp_socket }
   ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
 
 allow { appdomain -isolated_app } ion_device:chr_file r_file_perms;
+allow { appdomain -isolated_app } dmabuf_system_heap_device:chr_file r_file_perms;
 
 # Allow AAudio apps to use shared memory file descriptors from the HAL
 allow { appdomain -isolated_app } hal_audio:fd use;
@@ -542,7 +544,9 @@ neverallow appdomain {
   tmpfs
 }:lnk_file no_w_file_perms;
 
-# Blacklist app domains not allowed to execute from /data
+# Sensitive app domains are not allowed to execute from /data
+# to prevent persistence attacks and ensure all code is executed
+# from read-only locations.
 neverallow {
   bluetooth
   isolated_app
@@ -563,7 +567,7 @@ neverallow {
   -shell # bugreport
 } input_device:chr_file ~getattr;
 
-# Do not allow access to Bluetooth-related system properties except for a few whitelisted domains.
+# Do not allow access to Bluetooth-related system properties except for a few allowed domains.
 # neverallow rules for access to Bluetooth-related data files are above.
 neverallow {
   appdomain

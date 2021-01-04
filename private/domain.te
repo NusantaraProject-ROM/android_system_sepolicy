@@ -74,16 +74,12 @@ get_prop(domain, bq_config_prop);
 not_compatible_property(`
     # DO NOT ADD ANY PROPERTIES HERE
     get_prop(domain, core_property_type)
-    get_prop(domain, exported2_system_prop)
-    get_prop(domain, exported3_radio_prop)
     get_prop(domain, exported3_system_prop)
     get_prop(domain, vendor_default_prop)
 ')
 compatible_property_only(`
     # DO NOT ADD ANY PROPERTIES HERE
     get_prop({coredomain appdomain shell}, core_property_type)
-    get_prop({coredomain appdomain shell}, exported2_system_prop)
-    get_prop({coredomain appdomain shell}, exported3_radio_prop)
     get_prop({coredomain appdomain shell}, exported3_system_prop)
     get_prop({coredomain appdomain shell}, exported_camera_prop)
     get_prop({coredomain shell}, userspace_reboot_exported_prop)
@@ -109,19 +105,23 @@ allow domain linkerconfig_file:file r_file_perms;
 allow domain boringssl_self_test_marker:dir search;
 
 # Limit ability to ptrace or read sensitive /proc/pid files of processes
-# with other UIDs to these whitelisted domains.
+# with other UIDs to these allowlisted domains.
 neverallow {
   domain
   -vold
   userdebug_or_eng(`-llkd')
   -dumpstate
   userdebug_or_eng(`-incidentd')
+  userdebug_or_eng(`-profcollectd')
   -storaged
   -system_server
 } self:global_capability_class_set sys_ptrace;
 
 # Limit ability to generate hardware unique device ID attestations to priv_apps
 neverallow { domain -priv_app -gmscore_app } *:keystore_key gen_unique_id;
+neverallow { domain -priv_app -gmscore_app } *:keystore2_key gen_unique_id;
+neverallow { domain -system_server } *:keystore2_key use_dev_id;
+neverallow { domain -system_server } keystore:keystore2 { clear_ns lock reset unlock };
 
 neverallow {
   domain
@@ -212,7 +212,7 @@ neverallow {
 
 #
 # Assert that, to the extent possible, we're not loading executable content from
-# outside the rootfs or /system partition except for a few whitelisted domains.
+# outside the rootfs or /system partition except for a few allowlisted domains.
 # Executable files loaded from /data is a persistence vector
 # we want to avoid. See
 # https://bugs.chromium.org/p/project-zero/issues/detail?id=955 for example.
@@ -257,8 +257,6 @@ neverallow {
   -cppreopts
   -dex2oat
   -otapreopt_slot
-  -art_apex_postinstall
-  -art_apex_boot_integrity
 } dalvikcache_data_file:file no_w_file_perms;
 
 neverallow {
@@ -270,8 +268,6 @@ neverallow {
   -dex2oat
   -zygote
   -otapreopt_slot
-  -art_apex_boot_integrity
-  -art_apex_postinstall
 } dalvikcache_data_file:dir no_w_dir_perms;
 
 # Minimize dac_override and dac_read_search.
@@ -329,7 +325,7 @@ neverallow {
     -zygote
 } { fs_type -sdcard_type }:filesystem { mount remount relabelfrom relabelto };
 
-# Limit raw I/O to these whitelisted domains. Do not apply to debug builds.
+# Limit raw I/O to these allowlisted domains. Do not apply to debug builds.
 neverallow {
   domain
   userdebug_or_eng(`-domain')
@@ -366,3 +362,78 @@ neverallow { domain -init -system_server -dumpstate } firstboot_prop:file r_file
 
 # Kprobes should only be used by adb root
 neverallow { domain -init -vendor_init } debugfs_kprobes:file *;
+
+# On TREBLE devices, most coredomains should not access vendor_files.
+# TODO(b/71553434): Remove exceptions here.
+full_treble_only(`
+  neverallow {
+    coredomain
+    -appdomain
+    -bootanim
+    -crash_dump
+    -heapprofd
+    userdebug_or_eng(`-profcollectd')
+    -init
+    -iorap_inode2filename
+    -iorap_prefetcherd
+    -kernel
+    -traced_perf
+    -ueventd
+  } vendor_file:file { no_w_file_perms no_x_file_perms open };
+')
+
+# Vendor domains are not permitted to initiate communications to core domain sockets
+full_treble_only(`
+  neverallow_establish_socket_comms({
+    domain
+    -coredomain
+    -appdomain
+    -socket_between_core_and_vendor_violators
+  }, {
+    coredomain
+    -logd # Logging by writing to logd Unix domain socket is public API
+    -netd # netdomain needs this
+    -mdnsd # netdomain needs this
+    userdebug_or_eng(`-su') # communications with su are permitted only on userdebug or eng builds
+    -init
+    -tombstoned # linker to tombstoned
+    userdebug_or_eng(`-heapprofd')
+    userdebug_or_eng(`-traced_perf')
+  });
+')
+
+full_treble_only(`
+  # Do not allow system components access to /vendor files except for the
+  # ones allowed here.
+  neverallow {
+    coredomain
+    # TODO(b/37168747): clean up fwk access to /vendor
+    -crash_dump
+    -init # starts vendor executables
+    -iorap_inode2filename
+    -iorap_prefetcherd
+    -kernel # loads /vendor/firmware
+    userdebug_or_eng(`-heapprofd')
+    userdebug_or_eng(`-profcollectd')
+    -shell
+    -system_executes_vendor_violators
+    -traced_perf # library/binary access for symbolization
+    -ueventd # reads /vendor/ueventd.rc
+    -vold # loads incremental fs driver
+  } {
+    vendor_file_type
+    -same_process_hal_file
+    -vendor_app_file
+    -vendor_apex_file
+    -vendor_configs_file
+    -vendor_service_contexts_file
+    -vendor_framework_file
+    -vendor_idc_file
+    -vendor_keychars_file
+    -vendor_keylayout_file
+    -vendor_overlay_file
+    -vendor_public_lib_file
+    -vendor_task_profiles_file
+    -vndk_sp_file
+  }:file *;
+')

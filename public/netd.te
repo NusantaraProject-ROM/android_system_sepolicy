@@ -3,7 +3,7 @@ type netd, domain, mlstrustedsubject;
 type netd_exec, system_file_type, exec_type, file_type;
 
 net_domain(netd)
-# in addition to ioctls whitelisted for all domains, grant netd priv_sock_ioctls.
+# in addition to ioctls allowlisted for all domains, grant netd priv_sock_ioctls.
 allowxperm netd self:udp_socket ioctl priv_sock_ioctls;
 
 r_dir_file(netd, cgroup)
@@ -62,7 +62,7 @@ allow netd sysfs_net:file w_file_perms;
 # TODO: added to match above sysfs rule. Remove me?
 allow netd sysfs_usb:file write;
 
-r_dir_file(netd, cgroup_bpf)
+r_dir_file(netd, cgroup_v2)
 
 allow netd fs_bpf:dir search;
 allow netd fs_bpf:file { read write };
@@ -128,7 +128,7 @@ neverallow netd { domain }:process ptrace;
 neverallow netd system_file:dir_file_class_set write;
 
 # Write to files in /data/data or system files on /data
-neverallow netd { app_data_file privapp_data_file system_data_file }:dir_file_class_set write;
+neverallow netd { app_data_file_type system_data_file }:dir_file_class_set write;
 
 # only system_server, dumpstate and network stack app may find netd service
 neverallow {

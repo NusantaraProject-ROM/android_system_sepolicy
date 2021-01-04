@@ -5,12 +5,48 @@
 (typeattribute new_objects)
 (typeattributeset new_objects
   ( new_objects
+    ab_update_gki_prop
+    adbd_config_prop
     apex_info_file
+    cgroup_v2
     debugfs_kprobes
+    device_config_profcollect_native_boot_prop
+    device_state_service
+    dm_user_device
+    dmabuf_system_heap_device
+    framework_watchdog_config_prop
+    gki_apex_prepostinstall
+    gki_apex_prepostinstall_exec
+    hal_audiocontrol_service
+    hal_face_service
+    hal_fingerprint_service
     gnss_device
+    hal_dumpstate_config_prop
+    hal_gnss_service
+    hal_power_stats_service
+    keystore2_key_contexts_file
+    location_time_zone_manager_service
     mediatranscoding_tmpfs
+    music_recognition_service
+    nfc_logs_data_file
+    people_service
+    persist_vendor_debug_wifi_prop
+    power_debug_prop
+    power_stats_service
+    proc_kallsyms
     profcollectd
     profcollectd_data_file
     profcollectd_exec
-    profcollectd_service))
-
+    profcollectd_service
+    shell_test_data_file
+    snapuserd
+    snapuserd_exec
+    snapuserd_socket
+    sysfs_devices_cs_etm
+    system_server_dumper_service
+    system_suspend_control_internal_service
+    update_engine_stable_service
+    userspace_reboot_metadata_file
+    vcn_management_service
+    vibrator_manager_service
+    zygote_config_prop))

@@ -80,6 +80,10 @@ allow domain ashmem_libcutils_device:chr_file rw_file_perms;
 # /dev/binder can be accessed by ... everyone! :)
 allow { domain -hwservicemanager -vndservicemanager } binder_device:chr_file rw_file_perms;
 
+# Restrict binder ioctls to an allowlist. Additional ioctl commands may be
+# added to individual domains, but this sets safe defaults for all processes.
+allowxperm domain binder_device:chr_file ioctl { unpriv_binder_ioctls };
+
 # /dev/binderfs needs to be accessed by everyone too!
 allow domain binderfs:dir { getattr search };
 allow domain binderfs_logs_proc:dir search;
@@ -105,12 +109,13 @@ get_prop(domain, exported_default_prop)
 get_prop(domain, exported_dumpstate_prop)
 get_prop(domain, exported_secure_prop)
 get_prop(domain, exported_system_prop)
-get_prop(domain, exported2_default_prop)
 get_prop(domain, fingerprint_prop)
+get_prop(domain, hal_instrumentation_prop)
 get_prop(domain, init_service_status_prop)
 get_prop(domain, libc_debug_prop)
 get_prop(domain, logd_prop)
 get_prop(domain, mediadrm_config_prop)
+get_prop(domain, property_service_version_prop)
 get_prop(domain, socket_hook_prop)
 get_prop(domain, surfaceflinger_prop)
 get_prop(domain, telephony_status_prop)
@@ -233,12 +238,10 @@ not_full_treble(`
   allow domain system_data_file:dir getattr;
 ')
 allow { coredomain appdomain } system_data_file:dir getattr;
-# /data has the label system_data_root_file. Many components need search
-# permission on system_data_root_file for path traversal.
+# /data has the label system_data_root_file. Vendor components need the search
+# permission on system_data_root_file for path traversal to /data/vendor.
 allow domain system_data_root_file:dir { search getattr } ;
-# Isolated apps have no need to traverse system_data_file dirs
-allow { domain -isolated_app } system_data_file:dir search;
-# Vendor components need access to /dara/vendor
+allow domain system_data_file:dir search;
 # TODO restrict this to non-coredomain
 allow domain vendor_data_file:dir { getattr search };
 
@@ -272,19 +275,19 @@ allow domain debugfs_trace_marker:file w_file_perms;
 allow domain fs_type:filesystem getattr;
 allow domain fs_type:dir getattr;
 
-# Restrict all domains to a whitelist for common socket types. Additional
+# Restrict all domains to an allowlist for common socket types. Additional
 # ioctl commands may be added to individual domains, but this sets safe
-# defaults for all processes. Note that granting this whitelist to domain does
+# defaults for all processes. Note that granting this allowlist to domain does
 # not grant the ioctl permission on these socket types. That must be granted
 # separately.
 allowxperm domain domain:{ icmp_socket rawip_socket tcp_socket udp_socket }
   ioctl { unpriv_sock_ioctls unpriv_tty_ioctls };
-# default whitelist for unix sockets.
+# default allowlist for unix sockets.
 allowxperm domain { domain pdx_channel_socket_type }:{ unix_dgram_socket unix_stream_socket }
   ioctl unpriv_unix_sock_ioctls;
 
-# Restrict PTYs to only whitelisted ioctls.
-# Note that granting this whitelist to domain does
+# Restrict PTYs to only allowed ioctls.
+# Note that granting this allowlist to domain does
 # not grant the wider ioctl permission. That must be granted
 # separately.
 allowxperm domain devpts:chr_file ioctl unpriv_tty_ioctls;
@@ -300,7 +303,7 @@ allowxperm domain tun_device:chr_file ioctl { FIOCLEX FIONCLEX };
 
 # Allow a process to make a determination whether a file descriptor
 # for a plain file or pipe (fifo_file) is a tty. Note that granting
-# this whitelist to domain does not grant the ioctl permission to
+# this allowlist to domain does not grant the ioctl permission to
 # these files. That must be granted separately.
 allowxperm domain { file_type fs_type }:file ioctl { TCGETS };
 allowxperm domain domain:fifo_file ioctl { TCGETS };
@@ -343,7 +346,7 @@ allow domain apex_mnt_dir:lnk_file r_file_perms;
 ###
 
 # All ioctls on file-like objects (except chr_file and blk_file) and
-# sockets must be restricted to a whitelist.
+# sockets must be restricted to an allowlist.
 neverallowxperm * *:{ dir notdevfile_class_set socket_class_set blk_file } ioctl { 0 };
 
 # b/68014825 and https://android-review.googlesource.com/516535
@@ -358,7 +361,7 @@ neverallowxperm * devpts:chr_file ioctl TIOCSTI;
 # Do not allow any domain other than init to create unlabeled files.
 neverallow { domain -init -recovery } unlabeled:dir_file_class_set create;
 
-# Limit device node creation to these whitelisted domains.
+# Limit device node creation to these allowed domains.
 neverallow {
   domain
   -kernel
@@ -433,6 +436,17 @@ neverallow { domain -init } usermodehelper:file { append write };
 neverallow { domain -init -ueventd } sysfs_usermodehelper:file { append write };
 neverallow { domain -init -vendor_init } proc_security:file { append open read write };
 
+# Allow the tracing daemon and callstack sampler to use kallsyms to symbolize
+# kernel traces. Addresses are not disclosed, they are repalced with symbol
+# names (if available). Traces don't disclose KASLR.
+neverallow {
+  domain
+  -init
+  -vendor_init
+  -traced_probes
+  -traced_perf
+} proc_kallsyms:file { open read };
+
 # Init can't do anything with binder calls. If this neverallow rule is being
 # triggered, it's probably due to a service with no SELinux domain.
 neverallow * init:binder *;
@@ -469,6 +483,10 @@ neverallow {
 neverallow { domain userdebug_or_eng(`-kernel') } nativetest_data_file:file_class_set no_w_file_perms;
 neverallow domain nativetest_data_file:dir no_w_dir_perms;
 neverallow { domain userdebug_or_eng(`-shell') } nativetest_data_file:file no_x_file_perms;
+
+neverallow { domain -shell -init -adbd } shell_test_data_file:file_class_set no_w_file_perms;
+neverallow { domain -shell -init -adbd } shell_test_data_file:dir no_w_dir_perms;
+neverallow { domain -shell -init -adbd } shell_test_data_file:file *;
 
 # Only the init property service should write to /data/property and /dev/__properties__
 neverallow { domain -init } property_data_file:dir no_w_dir_perms;
@@ -540,7 +558,6 @@ compatible_property_only(`
     neverallow { domain -init } mmc_prop:property_service set;
     neverallow { domain -init -vendor_init } exported_default_prop:property_service set;
     neverallow { domain -init } exported_secure_prop:property_service set;
-    neverallow { domain -init } exported2_default_prop:property_service set;
     neverallow { domain -init -vendor_init } vendor_default_prop:property_service set;
     neverallow { domain -init -vendor_init } storage_config_prop:property_service set;
 ')
@@ -554,7 +571,7 @@ neverallow { domain -init } aac_drc_prop:property_service set;
 neverallow { domain -init } build_prop:property_service set;
 
 # Do not allow reading device's serial number from system properties except form
-# a few whitelisted domains.
+# a few allowed domains.
 neverallow {
   domain
   -adbd
@@ -644,7 +661,6 @@ full_treble_only(`
   neverallow {
     domain
     -coredomain
-    -binder_in_vendor_violators # TODO(b/131617943) remove once all violators are gone
   } {
     service_manager_type
     -vendor_service
@@ -654,17 +670,21 @@ full_treble_only(`
 full_treble_only(`
   # Vendor apps are permited to use only stable public services. If they were to use arbitrary
   # services which can change any time framework/core is updated, breakage is likely.
+  #
+  # Note, this same logic applies to untrusted apps, but neverallows for these are separate.
   neverallow {
     appdomain
     -coredomain
   } {
     service_manager_type
+
     -app_api_service
+    -vendor_service # must be @VintfStability to be used by an app
     -ephemeral_app_api_service
+
     -audioserver_service # TODO(b/36783122) remove exemptions below once app_api_service is fixed
     -cameraserver_service
     -drmserver_service
-    -hal_light_service # TODO(b/148154485) remove once all violators are gone
     -credstore_service
     -keystore_service
     -mediadrmserver_service
@@ -676,6 +696,7 @@ full_treble_only(`
     -virtual_touchpad_service
     -vr_hwc_service
     -vr_manager_service
+    userdebug_or_eng(`-hal_face_service')
   }:service_manager find;
 ')
 
@@ -726,25 +747,6 @@ full_treble_only(`
     -socket_between_core_and_vendor_violators
   });
 ')
-  # Vendor domains are not permitted to initiate communications to core domain sockets
-full_treble_only(`
-  neverallow_establish_socket_comms({
-    domain
-    -coredomain
-    -appdomain
-    -socket_between_core_and_vendor_violators
-  }, {
-    coredomain
-    -logd # Logging by writing to logd Unix domain socket is public API
-    -netd # netdomain needs this
-    -mdnsd # netdomain needs this
-    userdebug_or_eng(`-su') # communications with su are permitted only on userdebug or eng builds
-    -init
-    -tombstoned # linker to tombstoned
-    userdebug_or_eng(`-heapprofd')
-    userdebug_or_eng(`-traced_perf')
-  });
-')
 
   # Vendor domains are not permitted to initiate create/open sockets owned by core domains
 full_treble_only(`
@@ -788,6 +790,7 @@ full_treble_only(`
     dev_type
     -coredomain_socket
     -core_data_file_type
+    -app_data_file_type
     -unlabeled
   }:sock_file ~{ append getattr ioctl read write };
 ')
@@ -812,6 +815,7 @@ full_treble_only(`
   } {
     data_file_type
     -core_data_file_type
+    -app_data_file_type
   }:file_class_set ~{ append getattr ioctl read write map };
 ')
 full_treble_only(`
@@ -824,6 +828,7 @@ full_treble_only(`
     } {
       data_file_type
       -core_data_file_type
+      -app_data_file_type
       # TODO(b/72998741) Remove exemption. Further restricted in a subsequent
       # neverallow. Currently only getattr and search are allowed.
       -vendor_data_file
@@ -941,7 +946,7 @@ full_treble_only(`
 
 full_treble_only(`
     # Do not allow vendor components to execute files from system
-    # except for the ones whitelist here.
+    # except for the ones allowed here.
     neverallow {
         domain
         -coredomain
@@ -979,7 +984,7 @@ full_treble_only(`
 
 full_treble_only(`
     # Do not allow system components to execute files from vendor
-    # except for the ones whitelisted here.
+    # except for the ones allowed here.
     neverallow {
       coredomain
       -init
@@ -1007,43 +1012,8 @@ full_treble_only(`
 ')
 
 full_treble_only(`
-  # Do not allow system components access to /vendor files except for the
-  # ones whitelisted here.
-  neverallow {
-    coredomain
-    # TODO(b/37168747): clean up fwk access to /vendor
-    -crash_dump
-    -init # starts vendor executables
-    -iorap_inode2filename
-    -iorap_prefetcherd
-    -kernel # loads /vendor/firmware
-    userdebug_or_eng(`-heapprofd')
-    -shell
-    -system_executes_vendor_violators
-    -traced_perf # library/binary access for symbolization
-    -ueventd # reads /vendor/ueventd.rc
-    -vold # loads incremental fs driver
-  } {
-    vendor_file_type
-    -same_process_hal_file
-    -vendor_app_file
-    -vendor_apex_file
-    -vendor_configs_file
-    -vendor_service_contexts_file
-    -vendor_framework_file
-    -vendor_idc_file
-    -vendor_keychars_file
-    -vendor_keylayout_file
-    -vendor_overlay_file
-    -vendor_public_lib_file
-    -vendor_task_profiles_file
-    -vndk_sp_file
-  }:file *;
-')
-
-full_treble_only(`
   # Do not allow vendor components access to /system files except for the
-  # ones whitelisted here.
+  # ones allowed here.
   neverallow {
     domain
     -appdomain
@@ -1231,12 +1201,13 @@ neverallow {
   domain
   -shell
   userdebug_or_eng(`-uncrypt')
+  userdebug_or_eng(`-heapprofd')
   -installd
 } shell_data_file:lnk_file read;
 
 # In addition to the symlink reading restrictions above, restrict
 # write access to shell owned directories. The /data/local/tmp
-# directory is untrustworthy, and non-whitelisted domains should
+# directory is untrustworthy, and non-allowed domains should
 # not be trusting any content in those directories.
 neverallow {
   domain
@@ -1255,9 +1226,11 @@ neverallow {
   -dumpstate
   -init
   -installd
+  -iorap_inode2filename
   -simpleperf_app_runner
   -system_server # why?
   userdebug_or_eng(`-uncrypt')
+  userdebug_or_eng(`-heapprofd')
 } shell_data_file:dir { open search };
 
 # Same as above for /data/local/tmp files. We allow shell files
@@ -1269,6 +1242,7 @@ neverallow {
   -dumpstate
   -installd
   userdebug_or_eng(`-uncrypt')
+  userdebug_or_eng(`-heapprofd')
 } shell_data_file:file open;
 
 # servicemanager and vndservicemanager are the only processes which handle the
@@ -1342,24 +1316,6 @@ neverallow ~coredomain coredomain_hwservice:hwservice_manager add;
 # be passthrough only (i.e., run in the process of their clients instead of a
 # separate server process).
 neverallow * same_process_hwservice:hwservice_manager add;
-
-# On TREBLE devices, most coredomains should not access vendor_files.
-# TODO(b/71553434): Remove exceptions here.
-full_treble_only(`
-  neverallow {
-    coredomain
-    -appdomain
-    -bootanim
-    -crash_dump
-    -heapprofd
-    -init
-    -iorap_inode2filename
-    -iorap_prefetcherd
-    -kernel
-    -traced_perf
-    -ueventd
-  } vendor_file:file { no_w_file_perms no_x_file_perms open };
-')
 
 # If an already existing file is opened with O_CREAT, the kernel might generate
 # a false report of a create denial. Silence these denials and make sure that
@@ -1442,3 +1398,5 @@ neverallow {
   -untrusted_app_25
   -untrusted_app_27
 } ashmem_device:chr_file open;
+
+neverallow { domain -traced_probes -init -vendor_init } debugfs_tracing_printk_formats:file *;

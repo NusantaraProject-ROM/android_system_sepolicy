@@ -1,5 +1,6 @@
 # Properties used only in /system
 system_internal_prop(adbd_prop)
+system_internal_prop(device_config_profcollect_native_boot_prop)
 system_internal_prop(device_config_storage_native_boot_prop)
 system_internal_prop(device_config_sys_traced_prop)
 system_internal_prop(device_config_window_manager_native_boot_prop)
@@ -11,12 +12,20 @@ system_internal_prop(init_service_status_private_prop)
 system_internal_prop(init_svc_debug_prop)
 system_internal_prop(last_boot_reason_prop)
 system_internal_prop(localization_prop)
+system_internal_prop(lower_kptr_restrict_prop)
 system_internal_prop(netd_stable_secret_prop)
 system_internal_prop(pm_prop)
+system_internal_prop(setupwizard_prop)
 system_internal_prop(system_adbd_prop)
+system_internal_prop(suspend_prop)
 system_internal_prop(traced_perf_enabled_prop)
 system_internal_prop(userspace_reboot_log_prop)
 system_internal_prop(userspace_reboot_test_prop)
+system_internal_prop(verity_status_prop)
+system_internal_prop(zygote_wrap_prop)
+
+# TODO Remove this property when Keystore 2.0 migration is complete b/171563717
+system_internal_prop(keystore2_enable_prop)
 
 ###
 ### Neverallow rules
@@ -24,13 +33,14 @@ system_internal_prop(userspace_reboot_test_prop)
 
 treble_sysprop_neverallow(`
 
-# TODO(b/131162102): uncomment these after assigning ownership attributes to all properties
-# neverallow domain {
-#   property_type
-#   -system_property_type
-#   -product_property_type
-#   -vendor_property_type
-# }:file no_rw_file_perms;
+enforce_sysprop_owner(`
+  neverallow domain {
+    property_type
+    -system_property_type
+    -product_property_type
+    -vendor_property_type
+  }:file no_rw_file_perms;
+')
 
 neverallow { domain -coredomain } {
   system_property_type
@@ -140,8 +150,6 @@ compatible_property_only(`
     exported_default_prop
     exported_dumpstate_prop
     exported_system_prop
-    exported2_default_prop
-    exported2_system_prop
     exported3_system_prop
     usb_control_prop
     -nfc_prop
@@ -165,7 +173,7 @@ compatible_property_only(`
     -hal_telephony_server
     -vendor_init
   } {
-    exported3_radio_prop
+    radio_control_prop
   }:property_service set;
 
   neverallow {
@@ -236,7 +244,6 @@ compatible_property_only(`
     core_property_type
     dalvik_config_prop
     extended_core_property_type
-    exported2_system_prop
     exported3_system_prop
     systemsound_config_prop
     -debug_prop
@@ -281,6 +288,13 @@ compatible_property_only(`
   } {
     wifi_prop
   }:file no_rw_file_perms;
+
+  neverallow {
+    domain
+    -init
+  } {
+    suspend_prop
+  }:property_service set;
 ')
 
 compatible_property_only(`
@@ -317,6 +331,16 @@ neverallow {
   -system_server
 } {
   system_adbd_prop
+}:property_service set;
+
+# Let (vendor_)init, adbd, and system_server set service.adb.tcp.port
+neverallow {
+  -init
+  -vendor_init
+  -adbd
+  -system_server
+} {
+  adbd_config_prop
 }:property_service set;
 
 neverallow {
@@ -456,3 +480,47 @@ neverallow {
   -dumpstate
   -appdomain
 } camera_calibration_prop:file no_rw_file_perms;
+
+neverallow {
+  -init
+  -dumpstate
+  -hal_dumpstate_server
+  not_compatible_property(`-vendor_init')
+} hal_dumpstate_config_prop:file no_rw_file_perms;
+
+neverallow {
+  -init
+  userdebug_or_eng(`-traced_probes')
+  userdebug_or_eng(`-traced_perf')
+} {
+  lower_kptr_restrict_prop
+}:property_service set;
+
+# TODO Remove this property when Keystore 2.0 migration is complete b/171563717
+neverallow {
+  -init
+  -dumpstate
+  -system_app
+  -system_server
+  -zygote
+} keystore2_enable_prop:file no_rw_file_perms;
+
+neverallow {
+  -init
+} zygote_wrap_prop:property_service set;
+
+neverallow {
+  -init
+} verity_status_prop:property_service set;
+
+neverallow {
+  -init
+} setupwizard_prop:property_service set;
+
+# ro.product.property_source_order is useless after initialization of ro.product.* props.
+# So making it accessible only from init and vendor_init.
+neverallow {
+  -init
+  -dumpstate
+  -vendor_init
+} build_config_prop:file no_rw_file_perms;

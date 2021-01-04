@@ -14,9 +14,10 @@ perfetto_producer(traced_probes)
 allow traced_probes debugfs_tracing:dir r_dir_perms;
 allow traced_probes debugfs_tracing:file rw_file_perms;
 allow traced_probes debugfs_trace_marker:file getattr;
+allow traced_probes debugfs_tracing_printk_formats:file r_file_perms;
 
 # TODO(primiano): temporarily I/O tracing categories are still
-# userdebug only until we nail down the blacklist/whitelist.
+# userdebug only until we nail down the denylist/allowlist.
 userdebug_or_eng(`
 allow traced_probes debugfs_tracing_debug:dir r_dir_perms;
 allow traced_probes debugfs_tracing_debug:file rw_file_perms;
@@ -28,6 +29,11 @@ allow traced_probes self:global_capability_class_set { sys_nice };
 
 # Allow procfs access
 r_dir_file(traced_probes, domain)
+
+# Allow to temporarily lift the kptr_restrict setting and build a symbolization
+# map reading /proc/kallsyms.
+userdebug_or_eng(`set_prop(traced_probes, lower_kptr_restrict_prop)')
+allow traced_probes proc_kallsyms:file r_file_perms;
 
 # Allow to read packages.list file.
 allow traced_probes packages_list_file:file r_file_perms;

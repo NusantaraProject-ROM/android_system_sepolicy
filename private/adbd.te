@@ -87,8 +87,9 @@ set_prop(adbd, powerctl_prop)
 get_prop(adbd, ffs_config_prop)
 set_prop(adbd, ffs_control_prop)
 
-# Set service.adb.tls.port, persist.adb.wifi. properties
+# Set service.adb.tcp.port, service.adb.tls.port, persist.adb.wifi.* properties
 set_prop(adbd, adbd_prop)
+set_prop(adbd, adbd_config_prop)
 
 # Allow adbd start/stop mdnsd via ctl.start
 set_prop(adbd, ctl_mdnsd_prop)
@@ -192,10 +193,18 @@ allow adbd perfetto:process signal;
 allow adbd perfetto_traces_data_file:file r_file_perms;
 allow adbd perfetto_traces_data_file:dir r_dir_perms;
 
+# Allow to push and manage configs in /data/misc/perfetto-configs.
+allow adbd perfetto_configs_data_file:dir rw_dir_perms;
+allow adbd perfetto_configs_data_file:file create_file_perms;
+
 # Connect to shell and use a socket transferred from it.
 # Used for e.g. abb.
 allow adbd shell:unix_stream_socket { read write shutdown };
 allow adbd shell:fd use;
+
+# Allow pull /vendor/apex files for CTS tests
+allow adbd vendor_apex_file:dir search;
+allow adbd vendor_apex_file:file r_file_perms;
 
 ###
 ### Neverallow rules

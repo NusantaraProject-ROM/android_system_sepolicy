@@ -29,7 +29,7 @@ allow system_server incremental_control_file:file { ioctl r_file_perms };
 allowxperm system_server incremental_control_file:file ioctl { INCFS_IOCTL_CREATE_FILE INCFS_IOCTL_PERMIT_FILL };
 
 # To get signature of an APK installed on Incremental File System and fill in data blocks
-allowxperm system_server apk_data_file:file ioctl { INCFS_IOCTL_READ_SIGNATURE INCFS_IOCTL_FILL_BLOCKS };
+allowxperm system_server apk_data_file:file ioctl { INCFS_IOCTL_READ_SIGNATURE INCFS_IOCTL_FILL_BLOCKS INCFS_IOCTL_GET_FILLED_BLOCKS };
 
 # For art.
 allow system_server dalvikcache_data_file:dir r_dir_perms;
@@ -66,14 +66,14 @@ allow system_server zygote:unix_stream_socket { getopt getattr };
 
 # system server gets network and bluetooth permissions.
 net_domain(system_server)
-# in addition to ioctls whitelisted for all domains, also allow system_server
+# in addition to ioctls allowlisted for all domains, also allow system_server
 # to use privileged ioctls commands. Needed to set up VPNs.
 allowxperm system_server self:udp_socket ioctl priv_sock_ioctls;
 bluetooth_domain(system_server)
 
 # Allow setup of tcp keepalive offload. This gives system_server the permission to
 # call ioctl on app domains' tcp sockets. Additional ioctl commands still need to
-# be granted individually, except for a small set of safe values whitelisted in
+# be granted individually, except for a small set of safe values allowlisted in
 # public/domain.te.
 allow system_server appdomain:tcp_socket ioctl;
 
@@ -118,7 +118,7 @@ allow system_server config_gz:file { read open };
 # Use generic "sockets" where the address family is not known
 # to the kernel. The ioctl permission is specifically omitted here, but may
 # be added to device specific policy along with the ioctl commands to be
-# whitelisted.
+# allowlisted.
 allow system_server self:socket create_socket_perms_no_ioctl;
 
 # Set and get routes directly via netlink.
@@ -215,6 +215,7 @@ binder_call(system_server, incidentd)
 binder_call(system_server, iorapd)
 binder_call(system_server, netd)
 binder_call(system_server, notify_traceur)
+userdebug_or_eng(`binder_call(system_server, profcollectd)')
 binder_call(system_server, statsd)
 binder_call(system_server, storaged)
 binder_call(system_server, update_engine)
@@ -288,6 +289,7 @@ allow system_server {
   mediametrics
   mediaserver
   mediaswcodec
+  mediatranscoding
   netd
   sdcardd
   statsd
@@ -306,6 +308,7 @@ allow system_server {
   hal_graphics_allocator_server
   hal_graphics_composer_server
   hal_health_server
+  hal_light_server
   hal_neuralnetworks_server
   hal_omx_server
   hal_power_stats_server
@@ -345,7 +348,6 @@ allow system_server sysfs_ipv4:file w_file_perms;
 
 r_dir_file(system_server, sysfs_rtc)
 r_dir_file(system_server, sysfs_switch)
-r_dir_file(system_server, sysfs_wakeup_reasons)
 
 allow system_server sysfs_nfc_power_writable:file rw_file_perms;
 allow system_server sysfs_power:dir search;
@@ -518,16 +520,7 @@ allow system_server staging_data_file:dir create_dir_perms;
 allow system_server staging_data_file:file create_file_perms;
 
 # Walk /data/data subdirectories.
-# Types extracted from seapp_contexts type= fields.
-allow system_server {
-  system_app_data_file
-  bluetooth_data_file
-  nfc_data_file
-  radio_data_file
-  shell_data_file
-  app_data_file
-  privapp_data_file
-}:dir { getattr read search };
+allow system_server app_data_file_type:dir { getattr read search };
 
 # Also permit for unlabeled /data/data subdirectories and
 # for unlabeled asec containers on upgrades from 4.2.
@@ -540,16 +533,7 @@ allow system_server system_app_data_file:dir create_dir_perms;
 allow system_server system_app_data_file:file create_file_perms;
 
 # Receive and use open app data files passed over binder IPC.
-# Types extracted from seapp_contexts type= fields.
-allow system_server {
-  system_app_data_file
-  bluetooth_data_file
-  nfc_data_file
-  radio_data_file
-  shell_data_file
-  app_data_file
-  privapp_data_file
-}:file { getattr read write append map };
+allow system_server app_data_file_type:file { getattr read write append map };
 
 # Access to /data/media for measuring disk usage.
 allow system_server media_rw_data_file:dir { search getattr open read };
@@ -565,6 +549,9 @@ allow system_server system_server:process setfscreate;
 # Relabel apk files.
 allow system_server { apk_tmp_file apk_private_tmp_file }:{ dir file } { relabelfrom relabelto };
 allow system_server { apk_data_file apk_private_data_file }:{ dir file } { relabelfrom relabelto };
+# Allow PackageManager to rename file from /data/app-staging folder to /data/app during
+# staged apk install.
+allow system_server { staging_data_file }:{ dir file } { relabelfrom };
 
 # Relabel wallpaper.
 allow system_server system_data_file:file relabelfrom;
@@ -599,7 +586,6 @@ allow system_server server_configurable_flags_data_file:file r_file_perms;
 # Property Service write
 set_prop(system_server, system_prop)
 set_prop(system_server, exported_system_prop)
-set_prop(system_server, exported2_system_prop)
 set_prop(system_server, exported3_system_prop)
 set_prop(system_server, safemode_prop)
 set_prop(system_server, theme_prop)
@@ -640,6 +626,7 @@ set_prop(system_server, device_config_activity_manager_native_boot_prop)
 set_prop(system_server, device_config_runtime_native_boot_prop)
 set_prop(system_server, device_config_runtime_native_prop)
 set_prop(system_server, device_config_media_native_prop)
+set_prop(system_server, device_config_profcollect_native_boot_prop)
 set_prop(system_server, device_config_storage_native_boot_prop)
 set_prop(system_server, device_config_sys_traced_prop)
 set_prop(system_server, device_config_window_manager_native_boot_prop)
@@ -777,7 +764,6 @@ allow system_server fingerprintd_service:service_manager find;
 allow system_server gatekeeper_service:service_manager find;
 allow system_server gpu_service:service_manager find;
 allow system_server gsi_service:service_manager find;
-allow system_server hal_fingerprint_service:service_manager find;
 allow system_server idmap_service:service_manager find;
 allow system_server incident_service:service_manager find;
 allow system_server incremental_service:service_manager find;
@@ -822,6 +808,25 @@ allow system_server keystore:keystore_key {
 	clear_uid
 	add_auth
 	user_changed
+};
+
+allow system_server keystore:keystore2 {
+	add_auth
+	clear_ns
+	get_state
+	lock
+	reset
+	unlock
+};
+
+allow system_server keystore:keystore2_key {
+	delete
+	use_dev_id
+	grant
+	get_info
+	rebind
+	update
+	use
 };
 
 # Allow system server to search and write to the persistent factory reset
@@ -911,6 +916,11 @@ allow system_server preloads_media_file:dir { r_dir_perms write remove_name rmdi
 
 r_dir_file(system_server, cgroup)
 allow system_server ion_device:chr_file r_file_perms;
+allow system_server cgroup_v2:dir rw_dir_perms;
+allow system_server cgroup_v2:file rw_file_perms;
+
+# Access to /dev/dma_heap/system
+allow system_server dmabuf_system_heap_device:chr_file r_file_perms;
 
 r_dir_file(system_server, proc_asound)
 r_dir_file(system_server, proc_net_type)
@@ -991,6 +1001,16 @@ get_prop(system_server, system_lmk_prop)
 
 get_prop(system_server, wifi_config_prop)
 
+# Only system server can access BINDER_FREEZE and BINDER_GET_FROZEN_INFO
+allowxperm system_server binder_device:chr_file ioctl { BINDER_FREEZE BINDER_GET_FROZEN_INFO };
+
+# Watchdog prints debugging log to /dev/kmsg_debug.
+userdebug_or_eng(`
+  allow system_server kmsg_debug_device:chr_file { open append getattr };
+')
+# Watchdog reads sysprops framework_watchdog.fatal_* to handle watchdog timeout loop.
+get_prop(system_server, framework_watchdog_config_prop)
+
 ###
 ### Neverallow rules
 ###
@@ -1004,14 +1024,11 @@ neverallow system_server sdcard_type:file rw_file_perms;
 # system server should never be operating on zygote spawned app data
 # files directly. Rather, they should always be passed via a
 # file descriptor.
-# Types extracted from seapp_contexts type= fields, excluding
-# those types that system_server needs to open directly.
+# Exclude those types that system_server needs to open directly.
 neverallow system_server {
-  bluetooth_data_file
-  nfc_data_file
-  shell_data_file
-  app_data_file
-  privapp_data_file
+  app_data_file_type
+  -system_app_data_file
+  -radio_data_file
 }:file { open create unlink link };
 
 # Forking and execing is inherently dangerous and racy. See, for
@@ -1107,6 +1124,7 @@ allow system_server apex_mnt_dir:dir r_dir_perms;
 allow system_server apex_info_file:file r_file_perms;
 
 # Allow system server to communicate to system-suspend's control interface
+allow system_server system_suspend_control_internal_service:service_manager find;
 allow system_server system_suspend_control_service:service_manager find;
 binder_call(system_server, system_suspend)
 binder_call(system_suspend, system_server)
@@ -1140,6 +1158,9 @@ allow system_server metadata_file:dir search;
 allow system_server password_slot_metadata_file:dir rw_dir_perms;
 allow system_server password_slot_metadata_file:file create_file_perms;
 
+allow system_server userspace_reboot_metadata_file:dir create_dir_perms;
+allow system_server userspace_reboot_metadata_file:file create_file_perms;
+
 # Allow system server rw access to files in /metadata/staged-install folder
 allow system_server staged_install_file:dir rw_dir_perms;
 allow system_server staged_install_file:file create_file_perms;
@@ -1161,6 +1182,9 @@ neverallow {
 # Read/Write /proc/pressure/memory
 allow system_server proc_pressure_mem:file rw_file_perms;
 
+# TODO Remove this property when Keystore 2.0 migration is complete b/171563717
+get_prop(system_server, keystore2_enable_prop)
+
 # dexoptanalyzer is currently used only for secondary dex files which
 # system_server should never access.
 neverallow system_server dexoptanalyzer_exec:file no_x_file_perms;
@@ -1180,6 +1204,10 @@ neverallow {
   -system_server
 } password_slot_metadata_file:notdevfile_class_set ~{ relabelto getattr };
 neverallow { domain -init -system_server } password_slot_metadata_file:notdevfile_class_set *;
+
+# Only system_server/init should access /metadata/userspacereboot.
+neverallow { domain -init -system_server } userspace_reboot_metadata_file:dir *;
+neverallow { domain -init -system_server } userspace_reboot_metadata_file:file no_rw_file_perms;
 
 # Allow systemserver to read/write the invalidation property
 set_prop(system_server, binder_cache_system_server_prop)
@@ -1202,3 +1230,9 @@ neverallow {
   -dumpstate
   -system_server
 } wifi_config_prop:file no_rw_file_perms;
+
+# BINDER_FREEZE is used to block ipc transactions to frozen processes, so it
+# can be accessed by system_server only (b/143717177)
+# BINDER_GET_FROZEN_INFO is used by system_server to determine the state of a frozen binder
+# interface
+neverallowxperm { domain -system_server } binder_device:chr_file ioctl { BINDER_FREEZE BINDER_GET_FROZEN_INFO };

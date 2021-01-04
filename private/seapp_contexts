@@ -79,7 +79,8 @@
 # domain= determines the label to be used for the app process; entries
 # without domain= are ignored for this purpose.
 # type= specifies the label to be used for the app data directory; entries
-# without type= are ignored for this purpose.
+# without type= are ignored for this purpose. The label specified must
+# have the app_data_file_type attribute.
 # levelFrom and level are used to determine the level (sensitivity + categories)
 # for MLS/MCS.
 # levelFrom=none omits the level.
@@ -141,14 +142,14 @@ neverallow isEphemeralApp=true domain=((?!ephemeral_app).)*
 
 isSystemServer=true domain=system_server_startup
 
-user=_app seinfo=platform name=com.android.traceur domain=traceur_app type=app_data_file levelFrom=all
+user=_app isPrivApp=true name=com.android.traceur domain=traceur_app type=app_data_file levelFrom=all
 user=system seinfo=platform domain=system_app type=system_app_data_file
 user=bluetooth seinfo=platform domain=bluetooth type=bluetooth_data_file
 user=network_stack seinfo=network_stack domain=network_stack levelFrom=all type=radio_data_file
 user=nfc seinfo=platform domain=nfc type=nfc_data_file
 user=secure_element seinfo=platform domain=secure_element levelFrom=all
 user=radio seinfo=platform domain=radio type=radio_data_file
-user=shared_relro domain=shared_relro
+user=shared_relro domain=shared_relro levelFrom=all
 user=shell seinfo=platform domain=shell name=com.android.shell type=shell_data_file
 user=webview_zygote seinfo=webview_zygote domain=webview_zygote
 user=_isolated domain=isolated_app levelFrom=user

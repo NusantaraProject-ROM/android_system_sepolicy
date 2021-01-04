@@ -44,7 +44,6 @@ set_prop(system_app, debug_prop)
 set_prop(system_app, system_prop)
 set_prop(system_app, exported_bluetooth_prop)
 set_prop(system_app, exported_system_prop)
-set_prop(system_app, exported2_system_prop)
 set_prop(system_app, exported3_system_prop)
 set_prop(system_app, logd_prop)
 set_prop(system_app, net_radio_prop)
@@ -98,6 +97,7 @@ allow system_app {
   -iorapd_service
   -lpdump_service
   -netd_service
+  -system_suspend_control_internal_service
   -system_suspend_control_service
   -virtual_touchpad_service
   -vold_service
@@ -136,6 +136,15 @@ allow system_app keystore:keystore_key {
     user_changed
 };
 
+allow system_app keystore:keystore2_key {
+    delete
+    get_info
+    grant
+    rebind
+    update
+    use
+};
+
 # settings app reads /proc/version
 allow system_app {
   proc_version
@@ -155,6 +164,9 @@ allow system_app system_server:udp_socket {
 
 # Settings app reads ro.oem_unlock_supported
 get_prop(system_app, oem_unlock_prop)
+
+# TODO Remove this property when Keystore 2.0 migration is complete b/171563717
+get_prop(system_app, keystore2_enable_prop)
 
 ###
 ### Neverallow rules

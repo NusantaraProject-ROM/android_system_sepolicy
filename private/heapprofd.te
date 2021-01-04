@@ -29,7 +29,7 @@ typeattribute heapprofd mlstrustedsubject;
 allow heapprofd self:capability kill;
 
 # When scanning /proc/[pid]/cmdline to find matching processes for by-name
-# profiling, only whitelisted domains will be allowed by SELinux. Avoid
+# profiling, only allowlisted domains will be allowed by SELinux. Avoid
 # spamming logs with denials for entries that we can not access.
 dontaudit heapprofd domain:dir { search open };
 
@@ -45,6 +45,7 @@ userdebug_or_eng(`
   r_dir_file(heapprofd, apk_data_file)
   r_dir_file(heapprofd, dalvikcache_data_file)
   r_dir_file(heapprofd, vendor_file_type)
+  r_dir_file(heapprofd, shell_data_file)
   # Some dex files are not world-readable.
   # We are still constrained by the SELinux rules above.
   allow heapprofd self:global_capability_class_set dac_read_search;
