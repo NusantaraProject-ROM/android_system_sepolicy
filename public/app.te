@@ -170,6 +170,7 @@ allow appdomain incidentd:fifo_file { write getattr };
 unix_socket_send(appdomain, statsdw, statsd)
 
 # Write profiles /data/misc/profiles
+allow appdomain user_profile_root_file:dir search;
 allow appdomain user_profile_data_file:dir { search write add_name };
 allow appdomain user_profile_data_file:file create_file_perms;
 
@@ -473,10 +474,10 @@ neverallow appdomain system_data_file:dir_file_class_set
 # Write to various other parts of /data.
 neverallow appdomain drm_data_file:dir_file_class_set
     { create write setattr relabelfrom relabelto append unlink link rename };
-neverallow { appdomain -platform_app -system_app }
+neverallow { appdomain -platform_app }
     apk_data_file:dir_file_class_set
     { create write setattr relabelfrom relabelto append unlink link rename };
-neverallow { appdomain -platform_app -system_app }
+neverallow { appdomain -platform_app }
     apk_tmp_file:dir_file_class_set
     { create write setattr relabelfrom relabelto append unlink link rename };
 neverallow { appdomain -platform_app }
