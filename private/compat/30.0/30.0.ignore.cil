@@ -8,7 +8,9 @@
     ab_update_gki_prop
     adbd_config_prop
     apex_info_file
+    cgroup_desc_api_file
     cgroup_v2
+    ctl_snapuserd_prop
     debugfs_kprobes
     device_config_profcollect_native_boot_prop
     device_state_service
@@ -25,6 +27,7 @@
     hal_gnss_service
     hal_power_stats_service
     keystore2_key_contexts_file
+    legacy_permission_service
     location_time_zone_manager_service
     mediatranscoding_tmpfs
     music_recognition_service
@@ -45,6 +48,7 @@
     sysfs_devices_cs_etm
     system_server_dumper_service
     system_suspend_control_internal_service
+    task_profiles_api_file
     update_engine_stable_service
     userspace_reboot_metadata_file
     vcn_management_service

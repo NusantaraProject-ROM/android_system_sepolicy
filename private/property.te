@@ -1,6 +1,9 @@
 # Properties used only in /system
 system_internal_prop(adbd_prop)
+system_internal_prop(ctl_snapuserd_prop)
 system_internal_prop(device_config_profcollect_native_boot_prop)
+system_internal_prop(device_config_statsd_native_prop)
+system_internal_prop(device_config_statsd_native_boot_prop)
 system_internal_prop(device_config_storage_native_boot_prop)
 system_internal_prop(device_config_sys_traced_prop)
 system_internal_prop(device_config_window_manager_native_boot_prop)
@@ -524,3 +527,17 @@ neverallow {
   -dumpstate
   -vendor_init
 } build_config_prop:file no_rw_file_perms;
+
+neverallow {
+  -init
+  -shell
+} sqlite_log_prop:property_service set;
+
+neverallow {
+  -coredomain
+  -appdomain
+} sqlite_log_prop:file no_rw_file_perms;
+
+# Only one of system_property_type and vendor_property_type can be assigned.
+# Property types having both attributes won't be accessible from anywhere.
+neverallow domain system_and_vendor_property_type:{file property_service} *;
