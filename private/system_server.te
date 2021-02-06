@@ -24,16 +24,31 @@ allow system_server appdomain_tmpfs:file { getattr map read write };
 # For Incremental Service to check if incfs is available
 allow system_server proc_filesystems:file r_file_perms;
 
-# To create files and get permission to fill blocks on Incremental File System
-allow system_server incremental_control_file:file { ioctl r_file_perms };
-allowxperm system_server incremental_control_file:file ioctl { INCFS_IOCTL_CREATE_FILE INCFS_IOCTL_PERMIT_FILL };
+# Access the IncFS list of features
+r_dir_file(system_server, sysfs_fs_incfs_features);
 
-# To get signature of an APK installed on Incremental File System and fill in data blocks
-allowxperm system_server apk_data_file:file ioctl { INCFS_IOCTL_READ_SIGNATURE INCFS_IOCTL_FILL_BLOCKS INCFS_IOCTL_GET_FILLED_BLOCKS };
+# To create files, get permission to fill blocks, and configure Incremental File System
+allow system_server incremental_control_file:file { ioctl r_file_perms };
+allowxperm system_server incremental_control_file:file ioctl {
+  INCFS_IOCTL_CREATE_FILE
+  INCFS_IOCTL_CREATE_MAPPED_FILE
+  INCFS_IOCTL_PERMIT_FILL
+  INCFS_IOCTL_GET_READ_TIMEOUTS
+  INCFS_IOCTL_SET_READ_TIMEOUTS
+};
+
+# To get signature of an APK installed on Incremental File System, and fill in data
+# blocks and get the filesystem state
+allowxperm system_server apk_data_file:file ioctl {
+  INCFS_IOCTL_READ_SIGNATURE
+  INCFS_IOCTL_FILL_BLOCKS
+  INCFS_IOCTL_GET_FILLED_BLOCKS
+  INCFS_IOCTL_GET_BLOCK_COUNT
+};
 
 # For art.
-allow system_server dalvikcache_data_file:dir r_dir_perms;
-allow system_server dalvikcache_data_file:file r_file_perms;
+allow system_server { apex_art_data_file dalvikcache_data_file }:dir r_dir_perms;
+allow system_server { apex_art_data_file dalvikcache_data_file }:file r_file_perms;
 
 # When running system server under --invoke-with, we'll try to load the boot image under the
 # system server domain, following links to the system partition.
@@ -290,6 +305,7 @@ allow system_server {
   mediaserver
   mediaswcodec
   mediatranscoding
+  mediatuner
   netd
   sdcardd
   statsd
@@ -518,6 +534,9 @@ allow system_server zoneinfo_data_file:file create_file_perms;
 # Manage /data/app-staging.
 allow system_server staging_data_file:dir create_dir_perms;
 allow system_server staging_data_file:file create_file_perms;
+
+# Manage /data/rollback.
+allow system_server staging_data_file:{ file lnk_file } { create_file_perms link };
 
 # Walk /data/data subdirectories.
 allow system_server app_data_file_type:dir { getattr read search };
@@ -758,6 +777,7 @@ allow system_server sysfs_zram:file rw_file_perms;
 
 add_service(system_server, system_server_service);
 allow system_server audioserver_service:service_manager find;
+allow system_server authorization_service:service_manager find;
 allow system_server batteryproperties_service:service_manager find;
 allow system_server cameraserver_service:service_manager find;
 allow system_server dataloader_manager_service:service_manager find;
@@ -778,6 +798,7 @@ allow system_server mediaserver_service:service_manager find;
 allow system_server mediametrics_service:service_manager find;
 allow system_server mediaextractor_service:service_manager find;
 allow system_server mediadrmserver_service:service_manager find;
+allow system_server mediatuner_service:service_manager find;
 allow system_server netd_service:service_manager find;
 allow system_server nfc_service:service_manager find;
 allow system_server radio_service:service_manager find;
@@ -925,6 +946,8 @@ allow system_server cgroup_v2:file rw_file_perms;
 
 # Access to /dev/dma_heap/system
 allow system_server dmabuf_system_heap_device:chr_file r_file_perms;
+# Access to /dev/dma_heap/system-secure
+allow system_server dmabuf_system_secure_heap_device:chr_file r_file_perms;
 
 r_dir_file(system_server, proc_asound)
 r_dir_file(system_server, proc_net_type)
@@ -932,6 +955,7 @@ r_dir_file(system_server, proc_qtaguid_stat)
 allow system_server {
   proc_cmdline
   proc_loadavg
+  proc_locks
   proc_meminfo
   proc_pagetypeinfo
   proc_pipe_conf
@@ -1168,6 +1192,12 @@ allow system_server userspace_reboot_metadata_file:file create_file_perms;
 # Allow system server rw access to files in /metadata/staged-install folder
 allow system_server staged_install_file:dir rw_dir_perms;
 allow system_server staged_install_file:file create_file_perms;
+
+allow system_server watchdog_metadata_file:dir rw_dir_perms;
+allow system_server watchdog_metadata_file:file create_file_perms;
+
+# Allow system server r access to /system/bin/surfaceflinger for PinnerService.
+allow system_server surfaceflinger_exec:file r_file_perms;
 
 # Allow init to set sysprop used to compute stats about userspace reboot.
 set_prop(system_server, userspace_reboot_log_prop)
