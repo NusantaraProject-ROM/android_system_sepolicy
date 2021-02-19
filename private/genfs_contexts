@@ -154,11 +154,13 @@ genfscon sysfs /kernel/mm/transparent_hugepage u:object_r:sysfs_transparent_huge
 genfscon sysfs /kernel/notes u:object_r:sysfs_kernel_notes:s0
 genfscon sysfs /kernel/uevent_helper u:object_r:sysfs_usermodehelper:s0
 genfscon sysfs /kernel/wakeup_reasons u:object_r:sysfs_wakeup_reasons:s0
+genfscon sysfs /kernel/dmabuf/buffers u:object_r:sysfs_dmabuf_stats:s0
 genfscon sysfs /module/dm_verity/parameters/prefetch_cluster u:object_r:sysfs_dm_verity:s0
 genfscon sysfs /module/lowmemorykiller u:object_r:sysfs_lowmemorykiller:s0
 genfscon sysfs /module/tcp_cubic/parameters u:object_r:sysfs_net:s0
 genfscon sysfs /module/wlan/parameters/fwpath u:object_r:sysfs_wlan_fwpath:s0
 genfscon sysfs /devices/virtual/timed_output/vibrator/enable u:object_r:sysfs_vibrator:s0
+genfscon sysfs /devices/virtual/misc/uhid u:object_r:sysfs_uhid:s0
 
 genfscon debugfs /kprobes                             u:object_r:debugfs_kprobes:s0
 genfscon debugfs /mmc0                                u:object_r:debugfs_mmc:s0
@@ -173,6 +175,8 @@ genfscon tracefs /per_cpu/cpu                         u:object_r:debugfs_tracing
 
 genfscon debugfs /tracing/instances                   u:object_r:debugfs_tracing_instances:s0
 genfscon tracefs /instances                           u:object_r:debugfs_tracing_instances:s0
+genfscon debugfs /tracing/instances/mm_events         u:object_r:debugfs_mm_events_tracing:s0
+genfscon tracefs /instances/mm_events                 u:object_r:debugfs_mm_events_tracing:s0
 genfscon debugfs /tracing/instances/wifi              u:object_r:debugfs_wifi_tracing:s0
 genfscon tracefs /instances/wifi                      u:object_r:debugfs_wifi_tracing:s0
 genfscon debugfs /tracing/trace_marker                u:object_r:debugfs_trace_marker:s0

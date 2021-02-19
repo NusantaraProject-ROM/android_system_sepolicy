@@ -11,21 +11,26 @@
     apex_art_data_file
     apex_art_staging_data_file
     apex_info_file
+    app_hibernation_service
+    appcompat_data_file
     arm64_memtag_prop
     authorization_service
     cgroup_desc_api_file
     cgroup_v2
     ctl_snapuserd_prop
     debugfs_kprobes
+    debugfs_mm_events_tracing
     device_config_profcollect_native_boot_prop
     device_state_service
     dm_user_device
     dmabuf_heap_device
     dmabuf_system_heap_device
     dmabuf_system_secure_heap_device
+    domain_verification_service
     dumpstate_tmpfs
     framework_watchdog_config_prop
     game_service
+    font_data_file
     gki_apex_prepostinstall
     gki_apex_prepostinstall_exec
     hal_authsecret_service
@@ -42,6 +47,7 @@
     hal_keymint_service
     hal_neuralnetworks_service
     hal_power_stats_service
+    hal_weaver_service
     keystore_compat_hal_service
     keystore2_key_contexts_file
     legacy_permission_service
@@ -55,6 +61,9 @@
     nfc_logs_data_file
     odrefresh
     odrefresh_exec
+    odsign
+    odsign_data_file
+    odsign_exec
     people_service
     persist_vendor_debug_wifi_prop
     power_debug_prop
@@ -67,21 +76,27 @@
     profcollectd_service
     radio_core_data_file
     reboot_readiness_service
+    resolver_service
     search_ui_service
     shell_test_data_file
     smartspace_service
     snapuserd
     snapuserd_exec
     snapuserd_socket
+    soc_prop
     speech_recognition_service
     sysfs_devices_cs_etm
+    sysfs_dmabuf_stats
+    sysfs_uhid
     system_server_dumper_service
     system_suspend_control_internal_service
     task_profiles_api_file
+    texttospeech_service
     transformer_service
     update_engine_stable_service
     userspace_reboot_metadata_file
     vcn_management_service
     vibrator_manager_service
+    vpnmanager_service
     watchdog_metadata_file
     zygote_config_prop))
