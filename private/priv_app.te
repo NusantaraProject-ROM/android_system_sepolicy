@@ -25,6 +25,10 @@ create_pty(priv_app)
 # TODO: Tighten (b/112357170)
 allow priv_app privapp_data_file:file execute;
 
+# Chrome Crashpad uses the the dynamic linker to load native executables
+# from an APK (b/112050209, crbug.com/928422)
+allow priv_app system_linker_exec:file execute_no_trans;
+
 allow priv_app privapp_data_file:lnk_file create_file_perms;
 
 # Priv apps can find services that expose both @SystemAPI and normal APIs.
@@ -156,11 +160,12 @@ allow priv_app system_server:udp_socket {
 r_dir_file(priv_app, sysfs_fs_incfs_features)
 
 # allow apps like Phonesky to check the file signature of an apk installed on
-# the Incremental File System, fill missing blocks and get the app status
+# the Incremental File System, fill missing blocks and get the app status and loading progress
 allowxperm priv_app apk_data_file:file ioctl {
   INCFS_IOCTL_READ_SIGNATURE
   INCFS_IOCTL_FILL_BLOCKS
   INCFS_IOCTL_GET_BLOCK_COUNT
+  INCFS_IOCTL_GET_FILLED_BLOCKS
 };
 
 # allow privileged data loader apps (e.g. com.android.vending) to read logs from Incremental File System
@@ -235,6 +240,7 @@ neverallow priv_app trace_data_file:file { no_w_file_perms open };
 
 # Do not allow priv_app access to cgroups.
 neverallow priv_app cgroup:file *;
+neverallow priv_app cgroup_v2:file *;
 
 # Do not allow loading executable code from non-privileged
 # application home directories. Code loading across a security boundary
