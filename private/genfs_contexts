@@ -14,6 +14,7 @@ genfscon proc /kallsyms u:object_r:proc_kallsyms:s0
 genfscon proc /keys u:object_r:proc_keys:s0
 genfscon proc /kmsg u:object_r:proc_kmsg:s0
 genfscon proc /loadavg u:object_r:proc_loadavg:s0
+genfscon proc /locks u:object_r:proc_locks:s0
 genfscon proc /lowmemorykiller u:object_r:proc_lowmemorykiller:s0
 genfscon proc /meminfo u:object_r:proc_meminfo:s0
 genfscon proc /misc u:object_r:proc_misc:s0
@@ -66,6 +67,9 @@ genfscon proc /sys/kernel/sched_rt_period_us u:object_r:proc_sched:s0
 genfscon proc /sys/kernel/sched_rt_runtime_us u:object_r:proc_sched:s0
 genfscon proc /sys/kernel/sched_schedstats u:object_r:proc_sched:s0
 genfscon proc /sys/kernel/sched_tunable_scaling u:object_r:proc_sched:s0
+genfscon proc /sys/kernel/sched_util_clamp_max u:object_r:proc_sched:s0
+genfscon proc /sys/kernel/sched_util_clamp_min u:object_r:proc_sched:s0
+genfscon proc /sys/kernel/sched_util_clamp_min_rt_default u:object_r:proc_sched:s0
 genfscon proc /sys/kernel/sched_wakeup_granularity_ns u:object_r:proc_sched:s0
 genfscon proc /sys/kernel/sysrq u:object_r:proc_sysrq:s0
 genfscon proc /sys/kernel/usermodehelper u:object_r:usermodehelper:s0
@@ -136,6 +140,7 @@ genfscon sysfs /devices/virtual/wakeup          u:object_r:sysfs_wakeup:s0
 genfscon sysfs /firmware/devicetree/base/firmware/android u:object_r:sysfs_dt_firmware_android:s0
 genfscon sysfs /fs/ext4/features                  u:object_r:sysfs_fs_ext4_features:s0
 genfscon sysfs /fs/f2fs                           u:object_r:sysfs_fs_f2fs:s0
+genfscon sysfs /fs/incremental-fs/features        u:object_r:sysfs_fs_incfs_features:s0
 genfscon sysfs /power/autosleep u:object_r:sysfs_power:s0
 genfscon sysfs /power/state u:object_r:sysfs_power:s0
 genfscon sysfs /power/suspend_stats u:object_r:sysfs_suspend_stats:s0

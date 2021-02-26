@@ -158,7 +158,9 @@ func (m *selinuxContextsModule) GenerateAndroidBuildActions(ctx android.ModuleCo
 		if ctx.ProductSpecific() {
 			inputs = append(inputs, segroup.ProductPrivateSrcs()...)
 		} else if ctx.SocSpecific() {
-			inputs = append(inputs, segroup.SystemVendorSrcs()...)
+			if ctx.DeviceConfig().BoardSepolicyVers() == ctx.DeviceConfig().PlatformSepolicyVersion() {
+				inputs = append(inputs, segroup.SystemVendorSrcs()...)
+			}
 			inputs = append(inputs, segroup.VendorSrcs()...)
 		} else if ctx.DeviceSpecific() {
 			inputs = append(inputs, segroup.OdmSrcs()...)
@@ -170,7 +172,11 @@ func (m *selinuxContextsModule) GenerateAndroidBuildActions(ctx android.ModuleCo
 		}
 
 		if proptools.Bool(m.properties.Reqd_mask) {
-			inputs = append(inputs, segroup.SystemReqdMaskSrcs()...)
+			if ctx.SocSpecific() || ctx.DeviceSpecific() {
+				inputs = append(inputs, segroup.VendorReqdMaskSrcs()...)
+			} else {
+				inputs = append(inputs, segroup.SystemReqdMaskSrcs()...)
+			}
 		}
 	})
 
@@ -225,6 +231,7 @@ func (m *selinuxContextsModule) AndroidMk() android.AndroidMkData {
 			fmt.Fprintln(w, "\ninclude $(CLEAR_VARS)")
 			fmt.Fprintln(w, "LOCAL_PATH :=", moduleDir)
 			fmt.Fprintln(w, "LOCAL_MODULE :=", name+nameSuffix)
+			data.Entries.WriteLicenseVariables(w)
 			fmt.Fprintln(w, "LOCAL_MODULE_CLASS := ETC")
 			if m.Owner() != "" {
 				fmt.Fprintln(w, "LOCAL_MODULE_OWNER :=", m.Owner())
@@ -375,11 +382,13 @@ func (m *selinuxContextsModule) buildPropertyContexts(ctx android.ModuleContext,
 
 	var apiFiles android.Paths
 	ctx.VisitDirectDepsWithTag(syspropLibraryDepTag, func(c android.Module) {
-		i, ok := c.(interface{ CurrentSyspropApiFile() android.Path })
+		i, ok := c.(interface{ CurrentSyspropApiFile() android.OptionalPath })
 		if !ok {
 			panic(fmt.Errorf("unknown dependency %q for %q", ctx.OtherModuleName(c), ctx.ModuleName()))
 		}
-		apiFiles = append(apiFiles, i.CurrentSyspropApiFile())
+		if api := i.CurrentSyspropApiFile(); api.Valid() {
+			apiFiles = append(apiFiles, api.Path())
+		}
 	})
 
 	// check compatibility with sysprop_library
