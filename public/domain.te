@@ -403,13 +403,11 @@ neverallow * kernel:security setbool;
 # that could be set from init.rc.
 neverallow { domain -init } kernel:security setsecparam;
 
-# Only init, ueventd, shell and system_server should be able to access HW RNG
+# Only the kernel hwrng thread should be able to read from the HW RNG.
 neverallow {
   domain
-  -init
-  -shell # For CTS and is restricted to getattr in shell.te
-  -system_server
-  -ueventd
+  -shell # For CTS, restricted to just getattr in shell.te
+  -ueventd # To create the /dev/hw_random file
 } hw_random_device:chr_file *;
 # b/78174219 b/64114943
 neverallow {
@@ -478,7 +476,9 @@ neverallow { domain userdebug_or_eng(`-shell') } nativetest_data_file:file no_x_
 
 neverallow { domain -shell -init -adbd } shell_test_data_file:file_class_set no_w_file_perms;
 neverallow { domain -shell -init -adbd } shell_test_data_file:dir no_w_dir_perms;
-neverallow { domain -shell -init -adbd } shell_test_data_file:file *;
+neverallow { domain -shell -init -adbd -heapprofd } shell_test_data_file:file *;
+neverallow heapprofd shell_test_data_file:file { no_w_file_perms no_x_file_perms };
+neverallow { domain -shell -init -adbd } shell_test_data_file:sock_file *;
 
 # Only the init property service should write to /data/property and /dev/__properties__
 neverallow { domain -init } property_data_file:dir no_w_dir_perms;
@@ -1320,10 +1320,12 @@ neverallow domain {
 
 # cgroupfs directories can be created, but not files within them.
 neverallow domain cgroup:file create;
+neverallow domain cgroup_v2:file create;
 
 dontaudit domain proc_type:dir write;
 dontaudit domain sysfs_type:dir write;
 dontaudit domain cgroup:file create;
+dontaudit domain cgroup_v2:file create;
 
 # These are only needed in permissive mode - in enforcing mode the
 # directory write check fails and so these are never attempted.

@@ -29,6 +29,7 @@ type mediatranscoding_service,  app_api_service, service_manager_type;
 type netd_service,              service_manager_type;
 type nfc_service,               service_manager_type;
 type radio_service,             service_manager_type;
+type remoteprovisioning_service,   service_manager_type;
 type secure_element_service,    service_manager_type;
 type service_manager_service,   service_manager_type;
 type storaged_service,          service_manager_type;
@@ -38,6 +39,7 @@ type system_suspend_control_internal_service, service_manager_type;
 type system_suspend_control_service, service_manager_type;
 type update_engine_service,     service_manager_type;
 type update_engine_stable_service, service_manager_type;
+type usermanager_service,       service_manager_type;
 type virtual_touchpad_service,  service_manager_type;
 type vold_service,              service_manager_type;
 type vr_hwc_service,            service_manager_type;
@@ -113,6 +115,7 @@ type bugreport_service, app_api_service, system_server_service, service_manager_
 type platform_compat_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type face_service, app_api_service, system_server_service, service_manager_type;
 type fingerprint_service, app_api_service, system_server_service, service_manager_type;
+type fwk_stats_service, system_server_service, service_manager_type;
 type game_service, app_api_service, system_server_service, service_manager_type;
 type gfxinfo_service, system_api_service, system_server_service, service_manager_type;
 type gnss_time_update_service, system_server_service, service_manager_type;
@@ -135,6 +138,7 @@ type location_time_zone_manager_service, system_server_service, service_manager_
 type lock_settings_service, system_api_service, system_server_service, service_manager_type;
 type looper_stats_service, system_server_service, service_manager_type;
 type media_communication_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
+type media_metrics_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type media_projection_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type media_router_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type media_session_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
@@ -216,7 +220,7 @@ type vcn_management_service, app_api_service, ephemeral_app_api_service, system_
 type vibrator_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type vibrator_manager_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type voiceinteraction_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
-type vpnmanager_service, app_api_service, system_server_service, service_manager_type;
+type vpn_management_service, app_api_service, system_server_service, service_manager_type;
 type vr_manager_service, system_server_service, service_manager_type;
 type wallpaper_service, app_api_service, system_server_service, service_manager_type;
 type webviewupdate_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
@@ -250,6 +254,9 @@ type hal_oemlock_service, vendor_service, protected_service, service_manager_typ
 type hal_power_service, vendor_service, protected_service, service_manager_type;
 type hal_power_stats_service, vendor_service, protected_service, service_manager_type;
 type hal_rebootescrow_service, vendor_service, protected_service, service_manager_type;
+type hal_remotelyprovisionedcomponent_service, vendor_service, protected_service, service_manager_type;
+type hal_secureclock_service, vendor_service, protected_service, service_manager_type;
+type hal_sharedsecret_service, vendor_service, protected_service, service_manager_type;
 type hal_vibrator_service, vendor_service, protected_service, service_manager_type;
 type hal_weaver_service, vendor_service, protected_service, service_manager_type;
 
