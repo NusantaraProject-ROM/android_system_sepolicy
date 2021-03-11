@@ -11,6 +11,7 @@
     apex_art_data_file
     apex_art_staging_data_file
     apex_info_file
+    apex_ota_reserved_file
     apex_scheduling_data_file
     app_hibernation_service
     appcompat_data_file
@@ -21,6 +22,7 @@
     ctl_snapuserd_prop
     debugfs_kprobes
     debugfs_mm_events_tracing
+    debugfs_bootreceiver_tracing
     device_config_profcollect_native_boot_prop
     device_config_connectivity_prop
     device_config_swcodec_native_prop
@@ -56,6 +58,7 @@
     hal_secureclock_service
     hal_sharedsecret_service
     hal_weaver_service
+    hw_timeout_multiplier_prop
     keystore_compat_hal_service
     keystore2_key_contexts_file
     legacy_permission_service
@@ -84,6 +87,7 @@
     profcollectd_exec
     profcollectd_service
     qemu_hw_prop
+    qemu_sf_lcd_density_prop
     radio_core_data_file
     reboot_readiness_service
     remote_prov_app
@@ -113,6 +117,7 @@
     vcn_management_service
     vibrator_manager_service
     vpn_management_service
+    vpnprofilestore_service
     watchdog_metadata_file
     wifi_key
     zygote_config_prop))
