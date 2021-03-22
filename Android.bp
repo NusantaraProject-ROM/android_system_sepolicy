@@ -295,66 +295,10 @@ se_cil_compat_map {
 }
 
 se_cil_compat_map {
-    name: "system_ext_26.0.ignore.cil",
-    bottom_half: [":26.0.board.ignore.map"],
-    top_half: "system_ext_27.0.ignore.cil",
-    system_ext_specific: true,
-}
-
-se_cil_compat_map {
-    name: "system_ext_27.0.ignore.cil",
-    bottom_half: [":27.0.board.ignore.map"],
-    top_half: "system_ext_28.0.ignore.cil",
-    system_ext_specific: true,
-}
-
-se_cil_compat_map {
-    name: "system_ext_28.0.ignore.cil",
-    bottom_half: [":28.0.board.ignore.map"],
-    top_half: "system_ext_29.0.ignore.cil",
-    system_ext_specific: true,
-}
-
-se_cil_compat_map {
-    name: "system_ext_29.0.ignore.cil",
-    bottom_half: [":29.0.board.ignore.map"],
-    top_half: "system_ext_30.0.ignore.cil",
-    system_ext_specific: true,
-}
-
-se_cil_compat_map {
     name: "system_ext_30.0.ignore.cil",
     bottom_half: [":30.0.board.ignore.map"],
     // top_half: "system_ext_31.0.ignore.cil",
     system_ext_specific: true,
-}
-
-se_cil_compat_map {
-    name: "product_26.0.ignore.cil",
-    bottom_half: [":26.0.board.ignore.map"],
-    top_half: "product_27.0.ignore.cil",
-    product_specific: true,
-}
-
-se_cil_compat_map {
-    name: "product_27.0.ignore.cil",
-    bottom_half: [":27.0.board.ignore.map"],
-    top_half: "product_28.0.ignore.cil",
-    product_specific: true,
-}
-
-se_cil_compat_map {
-    name: "product_28.0.ignore.cil",
-    bottom_half: [":28.0.board.ignore.map"],
-    top_half: "product_29.0.ignore.cil",
-    product_specific: true,
-}
-
-se_cil_compat_map {
-    name: "product_29.0.ignore.cil",
-    bottom_half: [":29.0.board.ignore.map"],
-    top_half: "product_30.0.ignore.cil",
-    product_specific: true,
 }
 
 se_cil_compat_map {
