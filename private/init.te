@@ -16,6 +16,7 @@ recovery_only(`
   domain_trans(init, rootfs, fastbootd)
   domain_trans(init, rootfs, recovery)
   domain_trans(init, rootfs, linkerconfig)
+  domain_trans(init, rootfs, snapuserd)
 ')
 domain_trans(init, shell_exec, shell)
 domain_trans(init, init_exec, ueventd)
@@ -79,3 +80,9 @@ neverallow { -init } hal_instrumentation_prop:property_service set;
 
 # Only init can write ro.property_service.version
 neverallow { -init } property_service_version_prop:property_service set;
+
+# Only init can set keystore.boot_level
+neverallow { -init } keystore_listen_prop:property_service set;
+
+# Allow accessing /sys/kernel/tracing/instances/bootreceiver to set up tracing.
+allow init debugfs_bootreceiver_tracing:file w_file_perms;
