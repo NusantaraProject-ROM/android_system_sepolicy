@@ -240,7 +240,6 @@ binder_call(system_server, installd)
 binder_call(system_server, incidentd)
 binder_call(system_server, iorapd)
 binder_call(system_server, netd)
-binder_call(system_server, notify_traceur)
 userdebug_or_eng(`binder_call(system_server, profcollectd)')
 binder_call(system_server, statsd)
 binder_call(system_server, storaged)
@@ -636,6 +635,7 @@ set_prop(system_server, exported3_system_prop)
 set_prop(system_server, safemode_prop)
 set_prop(system_server, theme_prop)
 set_prop(system_server, dhcp_prop)
+set_prop(system_server, net_connectivity_prop)
 set_prop(system_server, net_radio_prop)
 set_prop(system_server, net_dns_prop)
 set_prop(system_server, usb_control_prop)
@@ -733,6 +733,9 @@ set_prop(system_server, dalvik_runtime_prop)
 
 # Read ro.control_privapp_permissions and ro.cp_system_other_odex
 get_prop(system_server, packagemanager_config_prop)
+
+# Read the net.464xlat.cellular.enabled property (written by init).
+get_prop(system_server, net_464xlat_fromvendor_prop)
 
 # Create a socket for connections from debuggerd.
 allow system_server system_ndebug_socket:sock_file create_file_perms;
@@ -891,6 +894,15 @@ allow system_server wifi_key:keystore2_key {
 	use
 };
 
+# Allow lock_settings service to manage RoR keys.
+allow system_server resume_on_reboot_key:keystore2_key {
+	delete
+	get_info
+	rebind
+	update
+	use
+};
+
 # Allow system server to search and write to the persistent factory reset
 # protection partition. This block device does not get wiped in a factory reset.
 allow system_server block_device:dir search;
@@ -1020,6 +1032,10 @@ r_dir_file(system_server, rootfs)
 allow system_server debugfs_tracing_instances:dir search;
 allow system_server debugfs_wifi_tracing:dir search;
 allow system_server debugfs_wifi_tracing:file rw_file_perms;
+
+# Allow BootReceiver to watch trace error_report events.
+allow system_server debugfs_bootreceiver_tracing:dir search;
+allow system_server debugfs_bootreceiver_tracing:file r_file_perms;
 
 # Allow system_server to read tracepoint ids in order to attach BPF programs to them.
 allow system_server debugfs_tracing:file r_file_perms;

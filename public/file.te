@@ -21,6 +21,7 @@ type proc_qtaguid_stat, fs_type, mlstrustedobject, proc_type;
 type proc_bluetooth_writable, fs_type, proc_type;
 type proc_abi, fs_type, proc_type;
 type proc_asound, fs_type, proc_type;
+type proc_bootconfig, fs_type, proc_type;
 type proc_buddyinfo, fs_type, proc_type;
 type proc_cmdline, fs_type, proc_type;
 type proc_cpuinfo, fs_type, proc_type;
@@ -380,6 +381,7 @@ type mirror_data_file, file_type, core_data_file_type;
 # /data/misc subdirectories
 type adb_keys_file, file_type, data_file_type, core_data_file_type;
 type apex_module_data_file, file_type, data_file_type, core_data_file_type;
+type apex_ota_reserved_file, file_type, data_file_type, core_data_file_type;
 type apex_permission_data_file, file_type, data_file_type, core_data_file_type;
 type apex_rollback_data_file, file_type, data_file_type, core_data_file_type;
 type apex_scheduling_data_file, file_type, data_file_type, core_data_file_type;
@@ -554,6 +556,9 @@ type hwservice_contexts_file, system_file_type, file_type;
 
 # vndservice_contexts file
 type vndservice_contexts_file, file_type;
+
+# /sys/kernel/tracing/instances/bootreceiver for monitoring kernel memory corruptions.
+type debugfs_bootreceiver_tracing, fs_type, debugfs_type;
 
 # Allow files to be created in their appropriate filesystems.
 allow fs_type self:filesystem associate;
