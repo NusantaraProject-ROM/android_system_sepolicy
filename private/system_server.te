@@ -12,6 +12,8 @@ typeattribute system_server stats_service_server;
 # Define a type for tmpfs-backed ashmem regions.
 tmpfs_domain(system_server)
 
+userfaultfd_use(system_server)
+
 # Create a socket for connections from crash_dump.
 type_transition system_server system_data_file:sock_file system_ndebug_socket "ndebugsocket";
 
@@ -820,6 +822,7 @@ allow system_server incident_service:service_manager find;
 allow system_server incremental_service:service_manager find;
 allow system_server installd_service:service_manager find;
 allow system_server iorapd_service:service_manager find;
+allow system_server keystore_maintenance_service:service_manager find;
 allow system_server keystore_service:service_manager find;
 allow system_server mediaserver_service:service_manager find;
 allow system_server mediametrics_service:service_manager find;
@@ -833,7 +836,6 @@ allow system_server stats_service:service_manager find;
 allow system_server storaged_service:service_manager find;
 allow system_server surfaceflinger_service:service_manager find;
 allow system_server update_engine_service:service_manager find;
-allow system_server usermanager_service:service_manager find;
 allow system_server vold_service:service_manager find;
 allow system_server wifinl80211_service:service_manager find;
 userdebug_or_eng(`
@@ -1265,6 +1267,9 @@ allow system_server staged_install_file:file create_file_perms;
 allow system_server watchdog_metadata_file:dir rw_dir_perms;
 allow system_server watchdog_metadata_file:file create_file_perms;
 
+allow system_server gsi_persistent_data_file:dir rw_dir_perms;
+allow system_server gsi_persistent_data_file:file create_file_perms;
+
 # Allow system server r access to /system/bin/surfaceflinger for PinnerService.
 allow system_server surfaceflinger_exec:file r_file_perms;
 
@@ -1284,9 +1289,6 @@ neverallow {
 
 # Read/Write /proc/pressure/memory
 allow system_server proc_pressure_mem:file rw_file_perms;
-
-# TODO Remove this property when Keystore 2.0 migration is complete b/171563717
-get_prop(system_server, keystore2_enable_prop)
 
 # dexoptanalyzer is currently used only for secondary dex files which
 # system_server should never access.
@@ -1328,6 +1330,7 @@ neverallow { domain -init -system_server } socket_hook_prop:property_service set
 neverallow { domain -init -system_server } boot_status_prop:property_service set;
 
 neverallow {
+  domain
   -init
   -vendor_init
   -dumpstate

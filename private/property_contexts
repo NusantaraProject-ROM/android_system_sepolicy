@@ -64,6 +64,7 @@ persist.log.tag         u:object_r:log_tag_prop:s0
 persist.mmc.            u:object_r:mmc_prop:s0
 persist.netd.stable_secret      u:object_r:netd_stable_secret_prop:s0
 persist.pm.mock-upgrade u:object_r:mock_ota_prop:s0
+persist.profcollectd.node_id    u:object_r:profcollectd_node_id_prop:s0     exact   string
 persist.sys.            u:object_r:system_prop:s0
 persist.sys.safemode    u:object_r:safemode_prop:s0
 persist.sys.theme       u:object_r:theme_prop:s0
@@ -187,7 +188,7 @@ dalvik.                 u:object_r:dalvik_prop:s0
 ro.dalvik.              u:object_r:dalvik_prop:s0
 
 # qemu_hw_prop is read/written by both system and vendor.
-qemu.hw.mainkeys        u:object_r:qemu_hw_prop:s0
+qemu.hw.mainkeys        u:object_r:qemu_hw_prop:s0 exact string
 
 # qemu_sf_lcd_density_prop is read/written by both system and vendor.
 qemu.sf.lcd_density     u:object_r:qemu_sf_lcd_density_prop:s0 exact int
@@ -244,6 +245,8 @@ persist.device_config.window_manager_native_boot.   u:object_r:device_config_win
 persist.device_config.global_settings.sys_traced u:object_r:device_config_sys_traced_prop:s0
 
 apexd.                  u:object_r:apexd_prop:s0
+apexd.config.dm_delete.timeout           u:object_r:apexd_config_prop:s0 exact uint
+apexd.config.dm_create.timeout           u:object_r:apexd_config_prop:s0 exact uint
 persist.apexd.          u:object_r:apexd_prop:s0
 
 bpf.progs_loaded        u:object_r:bpf_progs_loaded_prop:s0
@@ -257,6 +260,10 @@ ro.nnapi.extensions.deny_on_product                u:object_r:nnapi_ext_deny_pro
 
 # Property that is set once ueventd finishes cold boot.
 ro.cold_boot_done       u:object_r:cold_boot_done_prop:s0
+
+# Properties that control performance operations.
+# Leave space to later set drop_caches to 1, 2, and 4.
+perf.drop_caches        u:object_r:perf_drop_caches_prop:s0 exact enum 0 3
 
 # Charger properties
 ro.charger.                 u:object_r:charger_prop:s0
@@ -391,6 +398,8 @@ ro.zygote                                     u:object_r:dalvik_config_prop:s0 e
 persist.sys.dalvik.vm.lib.2 u:object_r:dalvik_runtime_prop:s0 exact string
 
 keyguard.no_require_sim u:object_r:keyguard_config_prop:s0 exact bool
+
+media.c2.dmabuf.padding                      u:object_r:codec2_config_prop:s0 exact int
 
 media.recorder.show_manufacturer_and_model   u:object_r:media_config_prop:s0 exact bool
 media.stagefright.cache-params               u:object_r:media_config_prop:s0 exact string
@@ -543,6 +552,10 @@ tombstoned.max_tombstone_count u:object_r:tombstone_config_prop:s0 exact int
 vold.post_fs_data_done u:object_r:vold_config_prop:s0 exact int
 
 apexd.status u:object_r:apexd_prop:s0 exact enum starting activated ready
+
+odsign.key.done u:object_r:odsign_prop:s0 exact bool
+odsign.verification.done u:object_r:odsign_prop:s0 exact bool
+odsign.verification.success u:object_r:odsign_prop:s0 exact bool
 
 dev.bootcomplete   u:object_r:boot_status_prop:s0 exact bool
 sys.boot_completed u:object_r:boot_status_prop:s0 exact bool
@@ -750,6 +763,7 @@ ro.odm.build.date                u:object_r:build_odm_prop:s0 exact string
 ro.odm.build.date.utc            u:object_r:build_odm_prop:s0 exact int
 ro.odm.build.fingerprint         u:object_r:build_odm_prop:s0 exact string
 ro.odm.build.version.incremental u:object_r:build_odm_prop:s0 exact string
+ro.odm.build.media_performance_class   u:object_r:build_odm_prop:s0 exact int
 
 ro.product.odm.brand        u:object_r:build_odm_prop:s0 exact string
 ro.product.odm.device       u:object_r:build_odm_prop:s0 exact string
@@ -805,6 +819,9 @@ ro.product.vendor.device       u:object_r:build_vendor_prop:s0 exact string
 ro.product.vendor.manufacturer u:object_r:build_vendor_prop:s0 exact string
 ro.product.vendor.model        u:object_r:build_vendor_prop:s0 exact string
 ro.product.vendor.name         u:object_r:build_vendor_prop:s0 exact string
+
+# GRF property for the first api level of the vendor partition
+ro.board.first_api_level u:object_r:build_vendor_prop:s0 exact int
 
 # Boot image build props set by /{second_stage_resources/,}boot/etc/build.prop
 ro.bootimage.build.date                        u:object_r:build_bootimage_prop:s0 exact string
@@ -1077,10 +1094,6 @@ power.battery_input.suspended u:object_r:power_debug_prop:s0 exact bool
 zygote.critical_window.minute u:object_r:zygote_config_prop:s0 exact int
 
 ro.zygote.disable_gl_preload u:object_r:zygote_config_prop:s0 exact bool
-
-# Enable Keystore 2.0.
-# TODO remove this property when Keystore 2.0 migration is complete b/171563717
-persist.android.security.keystore2.enable    u:object_r:keystore2_enable_prop:s0 exact bool
 
 # Broadcast boot stages, which keystore listens to
 keystore.boot_level u:object_r:keystore_listen_prop:s0 exact int
