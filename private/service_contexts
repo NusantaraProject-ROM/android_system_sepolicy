@@ -9,12 +9,16 @@ android.hardware.light.ILights/default                               u:object_r:
 android.hardware.memtrack.IMemtrack/default                          u:object_r:hal_memtrack_service:s0
 android.hardware.oemlock.IOemLock/default                            u:object_r:hal_oemlock_service:s0
 android.hardware.power.IPower/default                                u:object_r:hal_power_service:s0
-android.hardware.power.stats.IPowerStats/default                      u:object_r:hal_power_stats_service:s0
+android.hardware.power.stats.IPowerStats/default                     u:object_r:hal_power_stats_service:s0
 android.hardware.rebootescrow.IRebootEscrow/default                  u:object_r:hal_rebootescrow_service:s0
 android.hardware.security.keymint.IKeyMintDevice/default             u:object_r:hal_keymint_service:s0
+android.hardware.security.keymint.IRemotelyProvisionedComponent/default u:object_r:hal_remotelyprovisionedcomponent_service:s0
+android.hardware.security.secureclock.ISecureClock/default             u:object_r:hal_secureclock_service:s0
+android.hardware.security.sharedsecret.ISharedSecret/default             u:object_r:hal_sharedsecret_service:s0
 android.hardware.vibrator.IVibrator/default                          u:object_r:hal_vibrator_service:s0
 android.hardware.vibrator.IVibratorManager/default                   u:object_r:hal_vibrator_service:s0
 android.hardware.weaver.IWeaver/default                              u:object_r:hal_weaver_service:s0
+android.frameworks.stats.IStats/default                              u:object_r:fwk_stats_service:s0
 
 accessibility                             u:object_r:accessibility_service:s0
 account                                   u:object_r:account_service:s0
@@ -31,6 +35,8 @@ android.security.authorization            u:object_r:authorization_service:s0
 android.security.compat                   u:object_r:keystore_compat_hal_service:s0
 android.security.identity                 u:object_r:credstore_service:s0
 android.security.keystore                 u:object_r:keystore_service:s0
+android.security.remoteprovisioning       u:object_r:remoteprovisioning_service:s0
+android.security.usermanager              u:object_r:usermanager_service:s0
 android.service.gatekeeper.IGateKeeperService    u:object_r:gatekeeper_service:s0
 android.system.keystore2                  u:object_r:keystore_service:s0
 app_binding                               u:object_r:app_binding_service:s0
@@ -163,6 +169,7 @@ media.sound_trigger_hw                    u:object_r:audioserver_service:s0
 media.drm                                 u:object_r:mediadrmserver_service:s0
 media.tuner                               u:object_r:mediatuner_service:s0
 media_communication                       u:object_r:media_communication_service:s0
+media_metrics                             u:object_r:media_metrics_service:s0
 media_projection                          u:object_r:media_projection_service:s0
 media_resource_monitor                    u:object_r:media_session_service:s0
 media_router                              u:object_r:media_router_service:s0
@@ -260,6 +267,7 @@ time_detector                             u:object_r:timedetector_service:s0
 time_zone_detector                        u:object_r:timezonedetector_service:s0
 timezone                                  u:object_r:timezone_service:s0
 thermalservice                            u:object_r:thermal_service:s0
+tracing.proxy                             u:object_r:tracingproxy_service:s0
 transformer                               u:object_r:transformer_service:s0
 trust                                     u:object_r:trust_service:s0
 tv_input                                  u:object_r:tv_input_service:s0
@@ -277,7 +285,7 @@ vibrator_manager                          u:object_r:vibrator_manager_service:s0
 virtual_touchpad                          u:object_r:virtual_touchpad_service:s0
 voiceinteraction                          u:object_r:voiceinteraction_service:s0
 vold                                      u:object_r:vold_service:s0
-vpnmanager                                u:object_r:vpnmanager_service:s0
+vpn_management                            u:object_r:vpn_management_service:s0
 vr_hwc                                    u:object_r:vr_hwc_service:s0
 vrflinger_vsync                           u:object_r:vrflinger_vsync_service:s0
 vrmanager                                 u:object_r:vr_manager_service:s0
