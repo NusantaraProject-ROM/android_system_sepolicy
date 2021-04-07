@@ -1301,6 +1301,7 @@
     default_prop
     audio_config_prop
     build_config_prop
+    suspend_prop
     init_service_status_private_prop
     setupwizard_prop
     sqlite_log_prop

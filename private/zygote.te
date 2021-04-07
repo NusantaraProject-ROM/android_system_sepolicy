@@ -24,6 +24,8 @@ allow zygote app_zygote:process dyntransition;
 allow zygote appdomain:dir { getattr search };
 allow zygote appdomain:file { r_file_perms };
 
+userfaultfd_use(zygote)
+
 # Move children into the peer process group.
 allow zygote system_server:process { getpgid setpgid };
 allow zygote appdomain:process { getpgid setpgid };
@@ -75,6 +77,9 @@ allow zygote tmpfs:dir { create_dir_perms mounton };
 
 # Goes into media directory and bind mount obb directory
 allow zygote media_rw_data_file:dir { getattr search };
+
+# Bind mount on top of existing mounted obb and data directory
+allow zygote media_rw_data_file:dir { mounton };
 
 # Read if sdcardfs is supported
 allow zygote proc_filesystems:file r_file_perms;
@@ -220,9 +225,6 @@ get_prop(zygote, qemu_sf_lcd_density_prop)
 
 # Allow zygote to read /apex/apex-info-list.xml
 allow zygote apex_info_file:file r_file_perms;
-
-# TODO Remove this property when Keystore 2.0 migration is complete b/171563717
-get_prop(zygote, keystore2_enable_prop)
 
 ###
 ### neverallow rules

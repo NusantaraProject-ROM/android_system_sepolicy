@@ -13,6 +13,10 @@ allow apexd metadata_file:dir search;
 allow apexd apex_metadata_file:dir create_dir_perms;
 allow apexd apex_metadata_file:file create_file_perms;
 
+# Allow reserving space on /data/apex/ota_reserved for apex decompression
+allow apexd apex_ota_reserved_file:dir create_dir_perms;
+allow apexd apex_ota_reserved_file:file create_file_perms;
+
 # Allow apexd to create files and directories for snapshots of apex data
 allow apexd apex_art_data_file:dir { create_dir_perms relabelto };
 allow apexd apex_art_data_file:file { create_file_perms relabelto };
@@ -157,6 +161,9 @@ allow apexd toolbox_exec:file rx_file_perms;
 # Allow apexd to read ro.cold_boot_done prop.
 # apexd uses it to decide whether it needs to keep retrying polling for loop device.
 get_prop(apexd, cold_boot_done_prop)
+
+# Allow apexd to read per-device configuration properties.
+get_prop(apexd, apexd_config_prop)
 
 neverallow { domain -apexd -init } apex_data_file:dir no_w_dir_perms;
 neverallow { domain -apexd -init } apex_metadata_file:dir no_w_dir_perms;
