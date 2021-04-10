@@ -125,6 +125,7 @@ type graphicsstats_service, app_api_service, ephemeral_app_api_service, system_s
 type hardware_service, system_server_service, service_manager_type;
 type hardware_properties_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type hdmi_control_service, app_api_service, system_server_service, service_manager_type;
+type hint_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type imms_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type incremental_service, system_server_service, service_manager_type;
 type input_method_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
@@ -145,6 +146,7 @@ type media_projection_service, app_api_service, ephemeral_app_api_service, syste
 type media_router_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type media_session_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type meminfo_service, system_api_service, system_server_service, service_manager_type;
+type memtrackproxy_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type midi_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type mount_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
 type music_recognition_service, app_api_service, ephemeral_app_api_service, system_server_service, service_manager_type;
