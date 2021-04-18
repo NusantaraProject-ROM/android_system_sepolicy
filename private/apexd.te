@@ -13,6 +13,10 @@ allow apexd metadata_file:dir search;
 allow apexd apex_metadata_file:dir create_dir_perms;
 allow apexd apex_metadata_file:file create_file_perms;
 
+# Allow reserving space on /data/apex/ota_reserved for apex decompression
+allow apexd apex_ota_reserved_file:dir create_dir_perms;
+allow apexd apex_ota_reserved_file:file create_file_perms;
+
 # Allow apexd to create files and directories for snapshots of apex data
 allow apexd apex_art_data_file:dir { create_dir_perms relabelto };
 allow apexd apex_art_data_file:file { create_file_perms relabelto };
@@ -158,6 +162,9 @@ allow apexd toolbox_exec:file rx_file_perms;
 # apexd uses it to decide whether it needs to keep retrying polling for loop device.
 get_prop(apexd, cold_boot_done_prop)
 
+# Allow apexd to read per-device configuration properties.
+get_prop(apexd, apexd_config_prop)
+
 neverallow { domain -apexd -init } apex_data_file:dir no_w_dir_perms;
 neverallow { domain -apexd -init } apex_metadata_file:dir no_w_dir_perms;
 neverallow { domain -apexd -init -kernel } apex_data_file:file no_w_file_perms;
@@ -176,3 +183,9 @@ neverallow { domain -apexd -init } apexd_prop:property_service set;
 
 # only apexd can write apex-info-list.xml
 neverallow { domain -apexd } apex_info_file:file no_w_file_perms;
+
+# Allow for use in postinstall
+allow apexd otapreopt_chroot:fd use;
+allow apexd postinstall_apex_mnt_dir:dir { create_dir_perms mounton };
+allow apexd postinstall_apex_mnt_dir:file { create_file_perms relabelfrom };
+allow apexd proc_filesystems:file r_file_perms;

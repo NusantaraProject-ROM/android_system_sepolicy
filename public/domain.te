@@ -113,6 +113,7 @@ get_prop(domain, exported_secure_prop)
 get_prop(domain, exported_system_prop)
 get_prop(domain, fingerprint_prop)
 get_prop(domain, hal_instrumentation_prop)
+get_prop(domain, hw_timeout_multiplier_prop)
 get_prop(domain, init_service_status_prop)
 get_prop(domain, libc_debug_prop)
 get_prop(domain, logd_prop)
@@ -273,6 +274,14 @@ allow domain debugfs:dir search;
 allow domain debugfs_tracing:dir search;
 allow domain debugfs_tracing_debug:dir search;
 allow domain debugfs_trace_marker:file w_file_perms;
+
+# Linux lockdown mode offers coarse-grained definitions for access controls.
+# The "confidentiality" level detects access to tracefs or the perf subsystem.
+# This overlaps with more precise declarations in Android's policy. The
+# debugfs_trace_marker above is an example in which all processes should have
+# some access to tracefs. Therefore, allow all domains to access this level.
+# The "integrity" level is however enforced.
+allow domain self:lockdown confidentiality;
 
 # Filesystem access.
 allow domain fs_type:filesystem getattr;
@@ -505,7 +514,6 @@ neverallow { domain -kernel with_asan(`-asan_extract') } { system_file_type vend
 
 # Don't allow mounting on top of /system files or directories
 neverallow * exec_type:dir_file_class_set mounton;
-neverallow { domain -init } { system_file_type vendor_file_type }:dir_file_class_set mounton;
 
 # Nothing should be writing to files in the rootfs.
 neverallow * rootfs:file { create write setattr relabelto append unlink link rename };
@@ -550,6 +558,7 @@ compatible_property_only(`
     neverallow { domain -init } exported_secure_prop:property_service set;
     neverallow { domain -init -vendor_init } vendor_default_prop:property_service set;
     neverallow { domain -init -vendor_init } storage_config_prop:property_service set;
+    neverallow { domain -init -vendor_init } hw_timeout_multiplier_prop:property_service set;
 ')
 
 compatible_property_only(`
@@ -677,6 +686,7 @@ full_treble_only(`
     -cameraserver_service
     -drmserver_service
     -credstore_service
+    -keystore_maintenance_service
     -keystore_service
     -mediadrmserver_service
     -mediaextractor_service
@@ -685,6 +695,7 @@ full_treble_only(`
     -nfc_service
     -radio_service
     -virtual_touchpad_service
+    -vpnprofilestore_service
     -vr_hwc_service
     -vr_manager_service
     userdebug_or_eng(`-hal_face_service')
@@ -1392,3 +1403,6 @@ neverallow {
 } ashmem_device:chr_file open;
 
 neverallow { domain -traced_probes -init -vendor_init } debugfs_tracing_printk_formats:file *;
+
+# Linux lockdown "integrity" level is enforced for user builds.
+neverallow { domain userdebug_or_eng(`-domain') } self:lockdown integrity;

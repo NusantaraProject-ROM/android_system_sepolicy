@@ -15,10 +15,12 @@ android.hardware.security.keymint.IKeyMintDevice/default             u:object_r:
 android.hardware.security.keymint.IRemotelyProvisionedComponent/default u:object_r:hal_remotelyprovisionedcomponent_service:s0
 android.hardware.security.secureclock.ISecureClock/default             u:object_r:hal_secureclock_service:s0
 android.hardware.security.sharedsecret.ISharedSecret/default             u:object_r:hal_sharedsecret_service:s0
+android.hardware.soundtrigger3.ISoundTriggerHw/default               u:object_r:hal_audio_service:s0
 android.hardware.vibrator.IVibrator/default                          u:object_r:hal_vibrator_service:s0
 android.hardware.vibrator.IVibratorManager/default                   u:object_r:hal_vibrator_service:s0
 android.hardware.weaver.IWeaver/default                              u:object_r:hal_weaver_service:s0
 android.frameworks.stats.IStats/default                              u:object_r:fwk_stats_service:s0
+android.system.keystore2.IKeystoreService/default                    u:object_r:keystore_service:s0
 
 accessibility                             u:object_r:accessibility_service:s0
 account                                   u:object_r:account_service:s0
@@ -35,8 +37,9 @@ android.security.authorization            u:object_r:authorization_service:s0
 android.security.compat                   u:object_r:keystore_compat_hal_service:s0
 android.security.identity                 u:object_r:credstore_service:s0
 android.security.keystore                 u:object_r:keystore_service:s0
+android.security.maintenance              u:object_r:keystore_maintenance_service:s0
 android.security.remoteprovisioning       u:object_r:remoteprovisioning_service:s0
-android.security.usermanager              u:object_r:usermanager_service:s0
+android.security.vpnprofilestore          u:object_r:vpnprofilestore_service:s0
 android.service.gatekeeper.IGateKeeperService    u:object_r:gatekeeper_service:s0
 android.system.keystore2                  u:object_r:keystore_service:s0
 app_binding                               u:object_r:app_binding_service:s0
@@ -68,6 +71,7 @@ cacheinfo                                 u:object_r:cacheinfo_service:s0
 carrier_config                            u:object_r:radio_service:s0
 clipboard                                 u:object_r:clipboard_service:s0
 com.android.net.IProxyService             u:object_r:IProxyService_service:s0
+android.system.virtmanager                u:object_r:virtualization_service:s0
 companiondevice                           u:object_r:companion_device_service:s0
 platform_compat                           u:object_r:platform_compat_service:s0
 platform_compat_native                    u:object_r:platform_compat_service:s0
@@ -190,6 +194,7 @@ notification                              u:object_r:notification_service:s0
 oem_lock                                  u:object_r:oem_lock_service:s0
 otadexopt                                 u:object_r:otadexopt_service:s0
 overlay                                   u:object_r:overlay_service:s0
+pac_proxy                                 u:object_r:pac_proxy_service:s0
 package                                   u:object_r:package_service:s0
 package_native                            u:object_r:package_native_service:s0
 people                                    u:object_r:people_service:s0
@@ -201,7 +206,7 @@ phone1                                    u:object_r:radio_service:s0
 phone2                                    u:object_r:radio_service:s0
 phone                                     u:object_r:radio_service:s0
 pinner                                    u:object_r:pinner_service:s0
-power_stats                               u:object_r:power_stats_service:s0
+powerstats                                u:object_r:powerstats_service:s0
 power                                     u:object_r:power_service:s0
 print                                     u:object_r:print_service:s0
 processinfo                               u:object_r:processinfo_service:s0

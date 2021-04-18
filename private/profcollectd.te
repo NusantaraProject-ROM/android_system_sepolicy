@@ -1,5 +1,5 @@
 # profcollectd - hardware profile collection daemon
-type profcollectd, domain, coredomain;
+type profcollectd, domain, coredomain, mlstrustedsubject;
 type profcollectd_exec, system_file_type, exec_type, file_type;
 
 userdebug_or_eng(`
@@ -19,6 +19,10 @@ userdebug_or_eng(`
   allow profcollectd system_file_type:file r_file_perms;
   allow profcollectd vendor_file_type:file r_file_perms;
 
+  # Allow profcollectd to read system bootstrap libs.
+  allow profcollectd system_bootstrap_lib_file:dir search;
+  allow profcollectd system_bootstrap_lib_file:file r_file_perms;
+
   # Allow profcollectd to access tracefs.
   allow profcollectd debugfs_tracing:dir r_dir_perms;
   allow profcollectd debugfs_tracing:file rw_file_perms;
@@ -36,6 +40,7 @@ userdebug_or_eng(`
 
   # Allow profcollectd to read its system properties.
   get_prop(profcollectd, device_config_profcollect_native_boot_prop)
+  set_prop(profcollectd, profcollectd_node_id_prop)
 
   # Allow profcollectd to publish a binder service and make binder calls.
   binder_use(profcollectd)

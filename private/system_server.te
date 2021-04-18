@@ -12,6 +12,8 @@ typeattribute system_server stats_service_server;
 # Define a type for tmpfs-backed ashmem regions.
 tmpfs_domain(system_server)
 
+userfaultfd_use(system_server)
+
 # Create a socket for connections from crash_dump.
 type_transition system_server system_data_file:sock_file system_ndebug_socket "ndebugsocket";
 
@@ -240,7 +242,6 @@ binder_call(system_server, installd)
 binder_call(system_server, incidentd)
 binder_call(system_server, iorapd)
 binder_call(system_server, netd)
-binder_call(system_server, notify_traceur)
 userdebug_or_eng(`binder_call(system_server, profcollectd)')
 binder_call(system_server, statsd)
 binder_call(system_server, storaged)
@@ -636,6 +637,7 @@ set_prop(system_server, exported3_system_prop)
 set_prop(system_server, safemode_prop)
 set_prop(system_server, theme_prop)
 set_prop(system_server, dhcp_prop)
+set_prop(system_server, net_connectivity_prop)
 set_prop(system_server, net_radio_prop)
 set_prop(system_server, net_dns_prop)
 set_prop(system_server, usb_control_prop)
@@ -734,6 +736,9 @@ set_prop(system_server, dalvik_runtime_prop)
 # Read ro.control_privapp_permissions and ro.cp_system_other_odex
 get_prop(system_server, packagemanager_config_prop)
 
+# Read the net.464xlat.cellular.enabled property (written by init).
+get_prop(system_server, net_464xlat_fromvendor_prop)
+
 # Create a socket for connections from debuggerd.
 allow system_server system_ndebug_socket:sock_file create_file_perms;
 
@@ -817,6 +822,7 @@ allow system_server incident_service:service_manager find;
 allow system_server incremental_service:service_manager find;
 allow system_server installd_service:service_manager find;
 allow system_server iorapd_service:service_manager find;
+allow system_server keystore_maintenance_service:service_manager find;
 allow system_server keystore_service:service_manager find;
 allow system_server mediaserver_service:service_manager find;
 allow system_server mediametrics_service:service_manager find;
@@ -830,7 +836,6 @@ allow system_server stats_service:service_manager find;
 allow system_server storaged_service:service_manager find;
 allow system_server surfaceflinger_service:service_manager find;
 allow system_server update_engine_service:service_manager find;
-allow system_server usermanager_service:service_manager find;
 allow system_server vold_service:service_manager find;
 allow system_server wifinl80211_service:service_manager find;
 userdebug_or_eng(`
@@ -884,6 +889,15 @@ allow system_server keystore:keystore2_key {
 
 # Allow Wifi module to manage Wi-Fi keys.
 allow system_server wifi_key:keystore2_key {
+	delete
+	get_info
+	rebind
+	update
+	use
+};
+
+# Allow lock_settings service to manage RoR keys.
+allow system_server resume_on_reboot_key:keystore2_key {
 	delete
 	get_info
 	rebind
@@ -1020,6 +1034,10 @@ r_dir_file(system_server, rootfs)
 allow system_server debugfs_tracing_instances:dir search;
 allow system_server debugfs_wifi_tracing:dir search;
 allow system_server debugfs_wifi_tracing:file rw_file_perms;
+
+# Allow BootReceiver to watch trace error_report events.
+allow system_server debugfs_bootreceiver_tracing:dir search;
+allow system_server debugfs_bootreceiver_tracing:file r_file_perms;
 
 # Allow system_server to read tracepoint ids in order to attach BPF programs to them.
 allow system_server debugfs_tracing:file r_file_perms;
@@ -1249,6 +1267,9 @@ allow system_server staged_install_file:file create_file_perms;
 allow system_server watchdog_metadata_file:dir rw_dir_perms;
 allow system_server watchdog_metadata_file:file create_file_perms;
 
+allow system_server gsi_persistent_data_file:dir rw_dir_perms;
+allow system_server gsi_persistent_data_file:file create_file_perms;
+
 # Allow system server r access to /system/bin/surfaceflinger for PinnerService.
 allow system_server surfaceflinger_exec:file r_file_perms;
 
@@ -1268,9 +1289,6 @@ neverallow {
 
 # Read/Write /proc/pressure/memory
 allow system_server proc_pressure_mem:file rw_file_perms;
-
-# TODO Remove this property when Keystore 2.0 migration is complete b/171563717
-get_prop(system_server, keystore2_enable_prop)
 
 # dexoptanalyzer is currently used only for secondary dex files which
 # system_server should never access.
@@ -1312,6 +1330,7 @@ neverallow { domain -init -system_server } socket_hook_prop:property_service set
 neverallow { domain -init -system_server } boot_status_prop:property_service set;
 
 neverallow {
+  domain
   -init
   -vendor_init
   -dumpstate
