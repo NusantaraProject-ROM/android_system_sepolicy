@@ -66,6 +66,10 @@ allow init snapuserd:unix_stream_socket connectto;
 # Allow for libsnapshot's use of flock() on /metadata/ota.
 allow init ota_metadata_file:dir lock;
 
+# Allow init to restore contexts of vd_device(/dev/block/vd[..]) when labeling
+# /dev/block.
+allow init vd_device:blk_file relabelto;
+
 # Only init is allowed to set the sysprop indicating whether perf_event_open()
 # SELinux hooks were detected.
 set_prop(init, init_perf_lsm_hooks_prop)
@@ -89,3 +93,12 @@ neverallow { domain -init } keystore_listen_prop:property_service set;
 
 # Allow accessing /sys/kernel/tracing/instances/bootreceiver to set up tracing.
 allow init debugfs_bootreceiver_tracing:file w_file_perms;
+
+# chown/chmod on devices.
+allow init {
+  dev_type
+  -hw_random_device
+  -keychord_device
+  -kvm_device
+  -port_device
+}:chr_file setattr;

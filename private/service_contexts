@@ -201,6 +201,7 @@ people                                    u:object_r:people_service:s0
 performance_hint                          u:object_r:hint_service:s0
 permission                                u:object_r:permission_service:s0
 permissionmgr                             u:object_r:permissionmgr_service:s0
+permission_checker                        u:object_r:permission_checker_service:s0
 persistent_data_block                     u:object_r:persistent_data_block_service:s0
 phone_msim                                u:object_r:radio_service:s0
 phone1                                    u:object_r:radio_service:s0
@@ -274,7 +275,7 @@ time_zone_detector                        u:object_r:timezonedetector_service:s0
 timezone                                  u:object_r:timezone_service:s0
 thermalservice                            u:object_r:thermal_service:s0
 tracing.proxy                             u:object_r:tracingproxy_service:s0
-transformer                               u:object_r:transformer_service:s0
+translation                              u:object_r:translation_service:s0
 trust                                     u:object_r:trust_service:s0
 tv_input                                  u:object_r:tv_input_service:s0
 tv_tuner_resource_mgr                     u:object_r:tv_tuner_resource_mgr_service:s0
@@ -285,6 +286,7 @@ uri_grants                                u:object_r:uri_grants_service:s0
 usagestats                                u:object_r:usagestats_service:s0
 usb                                       u:object_r:usb_service:s0
 user                                      u:object_r:user_service:s0
+uwb                                       u:object_r:uwb_service:s0
 vcn_management                            u:object_r:vcn_management_service:s0
 vibrator                                  u:object_r:vibrator_service:s0
 vibrator_manager                          u:object_r:vibrator_manager_service:s0

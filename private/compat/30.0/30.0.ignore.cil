@@ -18,6 +18,8 @@
     appcompat_data_file
     arm64_memtag_prop
     authorization_service
+    bootanim_config_prop
+    camerax_extensions_prop
     cgroup_desc_api_file
     cgroup_v2
     codec2_config_prop
@@ -85,6 +87,7 @@
     odsign_data_file
     odsign_exec
     pac_proxy_service
+    permission_checker_service
     people_service
     persist_vendor_debug_wifi_prop
     postinstall_dexopt_exec
@@ -115,6 +118,8 @@
     snapuserd_socket
     soc_prop
     speech_recognition_service
+    sysfs_devfreq_cur
+    sysfs_devfreq_dir
     sysfs_devices_cs_etm
     sysfs_dma_heap
     sysfs_dmabuf_stats
@@ -123,11 +128,13 @@
     system_suspend_control_internal_service
     task_profiles_api_file
     texttospeech_service
-    transformer_service
+    translation_service
     update_engine_stable_service
     userdata_sysdev
     userspace_reboot_metadata_file
+    uwb_service
     vcn_management_service
+    vd_device
     vendor_kernel_modules
     vibrator_manager_service
     virtualization_service

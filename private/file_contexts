@@ -88,6 +88,7 @@
 /dev/block(/.*)?	u:object_r:block_device:s0
 /dev/block/dm-[0-9]+	u:object_r:dm_device:s0
 /dev/block/loop[0-9]*	u:object_r:loop_device:s0
+/dev/block/vd[a-z][0-9]*  u:object_r:vd_device:s0
 /dev/block/vold/.+	u:object_r:vold_device:s0
 /dev/block/ram[0-9]*	u:object_r:ram_device:s0
 /dev/block/zram[0-9]*	u:object_r:ram_device:s0
@@ -125,6 +126,7 @@
 /dev/pvrsrvkm		u:object_r:gpu_device:s0
 /dev/kmsg		u:object_r:kmsg_device:s0
 /dev/kmsg_debug	u:object_r:kmsg_debug_device:s0
+/dev/kvm		u:object_r:kvm_device:s0
 /dev/null		u:object_r:null_device:s0
 /dev/nvhdcp1		u:object_r:video_device:s0
 /dev/random		u:object_r:random_device:s0
@@ -189,6 +191,7 @@
 /dev/urandom		u:object_r:random_device:s0
 /dev/usb_accessory	u:object_r:usbaccessory_device:s0
 /dev/v4l-touch[0-9]*	u:object_r:input_device:s0
+/dev/vhost-vsock	u:object_r:kvm_device:s0
 /dev/video[0-9]*	u:object_r:video_device:s0
 /dev/vndbinder		u:object_r:vndbinder_device:s0
 /dev/watchdog		u:object_r:watchdog_device:s0
@@ -404,8 +407,6 @@
 
 /(vendor|system/vendor)/etc/selinux/vendor_service_contexts u:object_r:vendor_service_contexts_file:s0
 
-/(vendor|system/vendor)/bin/install-recovery\.sh u:object_r:vendor_install_recovery_exec:s0
-
 #############################
 # OEM and ODM files
 #
@@ -600,6 +601,7 @@
 /data/misc/net(/.*)?            u:object_r:net_data_file:s0
 /data/misc/network_watchlist(/.*)? u:object_r:network_watchlist_data_file:s0
 /data/misc/nfc/logs(/.*)?       u:object_r:nfc_logs_data_file:s0
+/data/misc/odrefresh(/.*)?      u:object_r:odrefresh_data_file:s0
 /data/misc/odsign(/.*)?         u:object_r:odsign_data_file:s0
 /data/misc/perfetto-traces/bugreport(.*)? u:object_r:perfetto_traces_bugreport_data_file:s0
 /data/misc/perfetto-traces(/.*)?          u:object_r:perfetto_traces_data_file:s0
