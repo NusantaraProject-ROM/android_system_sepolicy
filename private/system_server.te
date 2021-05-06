@@ -58,6 +58,9 @@ allow system_server {
   zygote
 }:process { sigkill signull };
 
+# ActivityManager/PackageManager
+allow system_server app_zygote:process getpgid;
+
 # Read /system/bin/app_process.
 allow system_server zygote_exec:file r_file_perms;
 

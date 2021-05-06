@@ -162,6 +162,10 @@ get_prop(system_app, device_logging_prop)
 allow system_app system_server:udp_socket {
         connect getattr read recvfrom sendto write getopt setopt };
 
+# Allow Settings mm stat for zram
+allow system_app sysfs_zram:dir search;
+allow system_app sysfs_zram:file read;
+
 ###
 ### Neverallow rules
 ###

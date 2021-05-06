@@ -121,6 +121,7 @@ full_treble_only(`
     -fsck
     -init
     -ueventd
+    -zygote
   } device:{ blk_file file } no_rw_file_perms;
 
   # debugfs
