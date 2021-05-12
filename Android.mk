@@ -436,7 +436,9 @@ LOCAL_LICENSE_CONDITIONS := notice unencumbered
 LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
 # Include precompiled policy, unless told otherwise.
 ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
+ifdef HAS_SYSTEM_EXT_SEPOLICY
 LOCAL_REQUIRED_MODULES += system_ext_sepolicy_and_mapping.sha256
+endif
 endif
 
 ifdef HAS_SYSTEM_EXT_SEPOLICY
@@ -481,7 +483,9 @@ LOCAL_LICENSE_CONDITIONS := notice unencumbered
 LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
 # Include precompiled policy, unless told otherwise.
 ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
+ifdef HAS_PRODUCT_SEPOLICY
 LOCAL_REQUIRED_MODULES += product_sepolicy_and_mapping.sha256
+endif
 endif
 
 ifdef HAS_PRODUCT_SEPOLICY
@@ -527,9 +531,15 @@ LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
 ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
 LOCAL_REQUIRED_MODULES += \
     precompiled_sepolicy \
-    precompiled_sepolicy.plat_sepolicy_and_mapping.sha256 \
-    precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256 \
-    precompiled_sepolicy.product_sepolicy_and_mapping.sha256 \
+    precompiled_sepolicy.plat_sepolicy_and_mapping.sha256
+
+ifdef HAS_SYSTEM_EXT_SEPOLICY
+LOCAL_REQUIRED_MODULES += precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256
+endif
+
+ifdef HAS_PRODUCT_SEPOLICY
+LOCAL_REQUIRED_MODULES += precompiled_sepolicy.product_sepolicy_and_mapping.sha256
+endif
 
 endif # ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
 
@@ -796,75 +806,6 @@ CHECKPOLICY_ASAN_OPTIONS := ASAN_OPTIONS=detect_leaks=0
 #################################
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := userdebug_plat_sepolicy.cil
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_PATH := $(TARGET_DEBUG_RAMDISK_OUT)
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-# userdebug_plat_policy.conf - the userdebug version plat_sepolicy.cil
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY))
-userdebug_plat_policy.conf := $(intermediates)/userdebug_plat_policy.conf
-$(userdebug_plat_policy.conf): PRIVATE_MLS_SENS := $(MLS_SENS)
-$(userdebug_plat_policy.conf): PRIVATE_MLS_CATS := $(MLS_CATS)
-$(userdebug_plat_policy.conf): PRIVATE_TARGET_BUILD_VARIANT := userdebug
-$(userdebug_plat_policy.conf): PRIVATE_TGT_ARCH := $(my_target_arch)
-$(userdebug_plat_policy.conf): PRIVATE_TGT_WITH_ASAN := $(with_asan)
-$(userdebug_plat_policy.conf): PRIVATE_TGT_WITH_NATIVE_COVERAGE := $(with_native_coverage)
-$(userdebug_plat_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
-$(userdebug_plat_policy.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
-$(userdebug_plat_policy.conf): PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
-$(userdebug_plat_policy.conf): PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
-$(userdebug_plat_policy.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
-$(userdebug_plat_policy.conf): PRIVATE_ENFORCE_SYSPROP_OWNER := $(enforce_sysprop_owner)
-$(userdebug_plat_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
-$(userdebug_plat_policy.conf): $(policy_files) $(M4)
-	$(transform-policy-to-conf)
-	$(hide) sed '/^\s*dontaudit.*;/d' $@ | sed '/^\s*dontaudit/,/;/d' > $@.dontaudit
-
-$(LOCAL_BUILT_MODULE): PRIVATE_ADDITIONAL_CIL_FILES := \
-  $(call build_policy, $(sepolicy_build_cil_workaround_files), $(PLAT_PRIVATE_POLICY))
-$(LOCAL_BUILT_MODULE): PRIVATE_NEVERALLOW_ARG := $(NEVERALLOW_ARG)
-$(LOCAL_BUILT_MODULE): $(userdebug_plat_policy.conf) $(HOST_OUT_EXECUTABLES)/checkpolicy \
-  $(HOST_OUT_EXECUTABLES)/secilc \
-  $(call build_policy, $(sepolicy_build_cil_workaround_files), $(PLAT_PRIVATE_POLICY)) \
-  $(built_sepolicy_neverallows)
-	@mkdir -p $(dir $@)
-	$(hide) $(CHECKPOLICY_ASAN_OPTIONS) $(HOST_OUT_EXECUTABLES)/checkpolicy -M -C -c \
-		$(POLICYVERS) -o $@.tmp $<
-	$(hide) cat $(PRIVATE_ADDITIONAL_CIL_FILES) >> $@.tmp
-	$(hide) $(HOST_OUT_EXECUTABLES)/secilc -m -M true -G -c $(POLICYVERS) $(PRIVATE_NEVERALLOW_ARG) $@.tmp -o /dev/null -f /dev/null
-	$(hide) mv $@.tmp $@
-
-userdebug_plat_policy.conf :=
-
-#################################
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := plat_sepolicy_vers.txt
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-LOCAL_PROPRIETARY_MODULE := true
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE) : PRIVATE_PLAT_SEPOL_VERS := $(BOARD_SEPOLICY_VERS)
-$(LOCAL_BUILT_MODULE) :
-	mkdir -p $(dir $@)
-	echo $(PRIVATE_PLAT_SEPOL_VERS) > $@
-
-#################################
-include $(CLEAR_VARS)
-
 # vendor_policy.cil - the vendor sepolicy. This needs attributization and to be combined
 # with the platform-provided policy.  It makes use of the reqd_policy_mask files from private
 # policy and the platform public policy files in order to use checkpolicy.
@@ -1062,78 +1003,6 @@ all_cil_files :=
 #   precompiled_sepolicy.product_sepolicy_and_mapping.sha256
 # See system/core/init/selinux.cpp for details.
 #################################
-
-#################################
-# SHA-256 digest of the plat_sepolicy.cil and plat_mapping_file against
-# which precompiled_policy was built.
-#################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := precompiled_sepolicy.plat_sepolicy_and_mapping.sha256
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-
-ifeq ($(BOARD_USES_ODMIMAGE),true)
-LOCAL_MODULE_PATH := $(TARGET_OUT_ODM)/etc/selinux
-else
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-endif
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE): PRIVATE_CIL_FILES := $(built_plat_cil) $(built_plat_mapping_cil)
-$(LOCAL_BUILT_MODULE): $(built_precompiled_sepolicy) $(built_plat_cil) $(built_plat_mapping_cil)
-	cat $(PRIVATE_CIL_FILES) | sha256sum | cut -d' ' -f1 > $@
-
-#################################
-# SHA-256 digest of the system_ext_sepolicy.cil and system_ext_mapping_file against
-# which precompiled_policy was built.
-#################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-
-ifeq ($(BOARD_USES_ODMIMAGE),true)
-LOCAL_MODULE_PATH := $(TARGET_OUT_ODM)/etc/selinux
-else
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-endif
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE): PRIVATE_CIL_FILES := $(built_system_ext_cil) $(built_system_ext_mapping_cil)
-$(LOCAL_BUILT_MODULE): $(built_precompiled_sepolicy) $(built_system_ext_cil) $(built_system_ext_mapping_cil)
-	cat $(PRIVATE_CIL_FILES) | sha256sum | cut -d' ' -f1 > $@
-
-#################################
-# SHA-256 digest of the product_sepolicy.cil and product_mapping_file against
-# which precompiled_policy was built.
-#################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := precompiled_sepolicy.product_sepolicy_and_mapping.sha256
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-
-ifeq ($(BOARD_USES_ODMIMAGE),true)
-LOCAL_MODULE_PATH := $(TARGET_OUT_ODM)/etc/selinux
-else
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-endif
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE): PRIVATE_CIL_FILES := $(built_product_cil) $(built_product_mapping_cil)
-$(LOCAL_BUILT_MODULE): $(built_precompiled_sepolicy) $(built_product_cil) $(built_product_mapping_cil)
-	cat $(PRIVATE_CIL_FILES) | sha256sum | cut -d' ' -f1 > $@
 
 #################################
 include $(CLEAR_VARS)

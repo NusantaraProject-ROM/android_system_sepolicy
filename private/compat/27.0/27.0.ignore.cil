@@ -28,6 +28,7 @@
     blank_screen_exec
     blank_screen_tmpfs
     boot_status_prop
+    bootanim_system_prop
     bootloader_boot_reason_prop
     bootloader_prop
     bluetooth_a2dp_offload_prop
@@ -227,6 +228,7 @@
     vndk_prop
     vold_config_prop
     vold_metadata_file
+    vold_post_fs_data_prop
     vold_prepare_subdirs
     vold_prepare_subdirs_exec
     vold_service
