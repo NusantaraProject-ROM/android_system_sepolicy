@@ -44,7 +44,7 @@ type buildFilesProperties struct {
 	// system/sepolicy/{public, private, vendor, reqd_mask}
 	// and directories specified by following config variables:
 	// BOARD_SEPOLICY_DIRS, BOARD_ODM_SEPOLICY_DIRS
-	// BOARD_PLAT_PUBLIC_SEPOLICY_DIR, BOARD_PLAT_PRIVATE_SEPOLICY_DIR
+	// SYSTEM_EXT_PUBLIC_SEPOLICY_DIR, SYSTEM_EXT_PRIVATE_SEPOLICY_DIR
 	Srcs []string
 }
 
@@ -188,4 +188,12 @@ func (b *buildFiles) GenerateAndroidBuildActions(ctx android.ModuleContext) {
 		// reqd_mask is needed for public policies
 		b.srcs["."+p.String()+"_public"] = b.findSrcsInDirs(ctx, append(gatherDirsFor(p, public), reqdMaskDir)...)
 	}
+
+	// A special tag, "plat_vendor", includes minimized vendor policies required to boot.
+	//   - system/sepolicy/public
+	//   - system/sepolicy/reqd_mask
+	//   - system/sepolicy/vendor
+	// This is for minimized vendor partition, e.g. microdroid's vendor
+	platVendorDir := filepath.Join(ctx.ModuleDir(), "vendor")
+	b.srcs[".plat_vendor"] = b.findSrcsInDirs(ctx, append(gatherDirsFor(system, public), reqdMaskDir, platVendorDir)...)
 }

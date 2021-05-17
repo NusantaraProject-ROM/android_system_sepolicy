@@ -86,6 +86,8 @@ type sysfs_android_usb, fs_type, sysfs_type;
 type sysfs_uio, sysfs_type, fs_type;
 type sysfs_batteryinfo, fs_type, sysfs_type;
 type sysfs_bluetooth_writable, fs_type, sysfs_type, mlstrustedobject;
+type sysfs_devfreq_cur, fs_type, sysfs_type;
+type sysfs_devfreq_dir, fs_type, sysfs_type;
 type sysfs_devices_block, fs_type, sysfs_type;
 type sysfs_dm, fs_type, sysfs_type;
 type sysfs_dm_verity, fs_type, sysfs_type;
@@ -561,6 +563,9 @@ type vndservice_contexts_file, file_type;
 
 # /sys/kernel/tracing/instances/bootreceiver for monitoring kernel memory corruptions.
 type debugfs_bootreceiver_tracing, fs_type, debugfs_type;
+
+# kernel modules
+type vendor_kernel_modules, vendor_file_type, file_type;
 
 # Allow files to be created in their appropriate filesystems.
 allow fs_type self:filesystem associate;

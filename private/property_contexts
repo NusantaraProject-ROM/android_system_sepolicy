@@ -241,6 +241,9 @@ persist.device_config.storage_native_boot.          u:object_r:device_config_sto
 persist.device_config.swcodec_native.               u:object_r:device_config_swcodec_native_prop:s0
 persist.device_config.window_manager_native_boot.   u:object_r:device_config_window_manager_native_boot_prop:s0
 
+# MM Events config props
+persist.mm_events.enabled                           u:object_r:mm_events_config_prop:s0 exact bool
+
 # Properties that relate to legacy server configurable flags
 persist.device_config.global_settings.sys_traced u:object_r:device_config_sys_traced_prop:s0
 
@@ -320,6 +323,8 @@ camera.disable_zsl_mode u:object_r:camera_config_prop:s0 exact bool
 camera.fifo.disable     u:object_r:camera_config_prop:s0 exact bool
 ro.camera.notify_nfc    u:object_r:camera_config_prop:s0 exact bool
 ro.camera.enableLazyHal u:object_r:camera_config_prop:s0 exact bool
+
+ro.camerax.extensions.enabled u:object_r:camerax_extensions_prop:s0 exact bool
 
 # Should always_debuggable be bool? It's checked against the string "1".
 dalvik.vm.always_debuggable                   u:object_r:dalvik_config_prop:s0 exact int
@@ -420,12 +425,16 @@ persist.bluetooth.btsnoopenable                u:object_r:exported_bluetooth_pro
 
 persist.radio.multisim.config u:object_r:radio_control_prop:s0 exact string
 
-persist.sys.hdmi.keep_awake                  u:object_r:hdmi_config_prop:s0 exact bool
-ro.hdmi.cec_device_types                     u:object_r:hdmi_config_prop:s0 exact string
-ro.hdmi.device_type                          u:object_r:hdmi_config_prop:s0 exact string
-ro.hdmi.cec.source.set_menu_language.enabled u:object_r:hdmi_config_prop:s0 exact bool
-ro.hdmi.wake_on_hotplug                      u:object_r:hdmi_config_prop:s0 exact bool
-ro.hdmi.cec.source.send_standby_on_sleep     u:object_r:hdmi_config_prop:s0 exact enum to_tv broadcast none
+persist.sys.hdmi.keep_awake                                        u:object_r:hdmi_config_prop:s0 exact bool
+ro.hdmi.cec_device_types                                           u:object_r:hdmi_config_prop:s0 exact string
+ro.hdmi.device_type                                                u:object_r:hdmi_config_prop:s0 exact string
+ro.hdmi.set_menu_language                                          u:object_r:hdmi_config_prop:s0 exact bool
+ro.hdmi.cec.source.set_menu_language.enabled                       u:object_r:hdmi_config_prop:s0 exact bool
+ro.hdmi.property_sytem_audio_device_arc_port                       u:object_r:hdmi_config_prop:s0 exact string
+ro.hdmi.cec_audio_device_forward_volume_keys_system_audio_mode_off u:object_r:hdmi_config_prop:s0 exact bool
+ro.hdmi.property_is_device_hdmi_cec_switch                         u:object_r:hdmi_config_prop:s0 exact bool
+ro.hdmi.wake_on_hotplug                                            u:object_r:hdmi_config_prop:s0 exact bool
+ro.hdmi.cec.source.send_standby_on_sleep                           u:object_r:hdmi_config_prop:s0 exact enum to_tv broadcast none
 
 pm.dexopt.ab-ota                            u:object_r:exported_pm_prop:s0 exact string
 pm.dexopt.bg-dexopt                         u:object_r:exported_pm_prop:s0 exact string
@@ -498,6 +507,7 @@ ro.lmk.psi_complete_stall_ms    u:object_r:lmkd_config_prop:s0 exact int
 ro.lmk.swap_free_low_percentage u:object_r:lmkd_config_prop:s0 exact int
 ro.lmk.swap_util_max            u:object_r:lmkd_config_prop:s0 exact int
 ro.lmk.thrashing_limit          u:object_r:lmkd_config_prop:s0 exact int
+ro.lmk.thrashing_limit_critical u:object_r:lmkd_config_prop:s0 exact int
 ro.lmk.thrashing_limit_decay    u:object_r:lmkd_config_prop:s0 exact int
 ro.lmk.use_minfree_levels       u:object_r:lmkd_config_prop:s0 exact bool
 ro.lmk.upgrade_pressure         u:object_r:lmkd_config_prop:s0 exact int
@@ -592,7 +602,8 @@ hal.instrumentation.enable u:object_r:hal_instrumentation_prop:s0 exact bool
 # default contexts only accessible by coredomain
 init.svc. u:object_r:init_service_status_private_prop:s0 prefix string
 
-# vendor-init-readable init service props
+# Globally-readable init service props
+init.svc.adbd           u:object_r:init_service_status_prop:s0 exact string
 init.svc.bugreport      u:object_r:init_service_status_prop:s0 exact string
 init.svc.bugreportd     u:object_r:init_service_status_prop:s0 exact string
 init.svc.console        u:object_r:init_service_status_prop:s0 exact string
@@ -631,6 +642,8 @@ ro.boot.hardware.color     u:object_r:bootloader_prop:s0 exact string
 ro.boot.hardware.sku       u:object_r:bootloader_prop:s0 exact string
 ro.boot.keymaster          u:object_r:bootloader_prop:s0 exact string
 ro.boot.mode               u:object_r:bootloader_prop:s0 exact string
+# Populated on Android Studio Emulator (for emulator specific workarounds)
+ro.boot.qemu               u:object_r:bootloader_prop:s0 exact bool
 ro.boot.revision           u:object_r:bootloader_prop:s0 exact string
 ro.boot.vbmeta.avb_version u:object_r:bootloader_prop:s0 exact string
 ro.boot.verifiedbootstate  u:object_r:bootloader_prop:s0 exact string
@@ -796,6 +809,9 @@ ro.old_dlkm.build.version.release             u:object_r:build_vendor_prop:s0 ex
 ro.old_dlkm.build.version.release_or_codename u:object_r:build_vendor_prop:s0 exact string
 ro.old_dlkm.build.version.sdk                 u:object_r:build_vendor_prop:s0 exact int
 
+# enforces debugfs restrictions in non-user builds, set by /vendor/build.prop
+ro.product.debugfs_restrictions.enabled u:object_r:debugfs_restriction_prop:s0 exact bool
+
 # All vendor build props are set by /vendor/build.prop
 ro.vendor.build.date                        u:object_r:build_vendor_prop:s0 exact string
 ro.vendor.build.date.utc                    u:object_r:build_vendor_prop:s0 exact int
@@ -823,6 +839,7 @@ ro.product.vendor.name         u:object_r:build_vendor_prop:s0 exact string
 
 # GRF property for the first api level of the vendor partition
 ro.board.first_api_level u:object_r:build_vendor_prop:s0 exact int
+ro.board.api_level       u:object_r:build_vendor_prop:s0 exact int
 
 # Boot image build props set by /{second_stage_resources/,}boot/etc/build.prop
 ro.bootimage.build.date                        u:object_r:build_bootimage_prop:s0 exact string
@@ -945,6 +962,8 @@ ro.hw_timeout_multiplier u:object_r:hw_timeout_multiplier_prop:s0 exact int
 
 ro.hwui.use_vulkan u:object_r:exported_default_prop:s0 exact bool
 
+# ro.kernel.* properties are emulator specific and deprecated. Do not use.
+# Should be retired once presubmit allows.
 ro.kernel.qemu             u:object_r:exported_default_prop:s0 exact bool
 ro.kernel.qemu.            u:object_r:exported_default_prop:s0
 ro.kernel.android.bootanim u:object_r:exported_default_prop:s0 exact int
@@ -1147,3 +1166,6 @@ ro.soc.model        u:object_r:soc_prop:s0 exact string
 # set to true when running rollback tests to disable fallback-to-copy when enabling rollbacks
 # to detect failures where hard linking should work otherwise
 persist.rollback.is_test u:object_r:rollback_test_prop:s0 exact bool
+
+# bootanimation properties
+ro.bootanim.quiescent.enabled u:object_r:bootanim_config_prop:s0 exact bool

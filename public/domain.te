@@ -446,17 +446,6 @@ neverallow { domain -init } usermodehelper:file { append write };
 neverallow { domain -init -ueventd } sysfs_usermodehelper:file { append write };
 neverallow { domain -init -vendor_init } proc_security:file { append open read write };
 
-# Allow the tracing daemon and callstack sampler to use kallsyms to symbolize
-# kernel traces. Addresses are not disclosed, they are repalced with symbol
-# names (if available). Traces don't disclose KASLR.
-neverallow {
-  domain
-  -init
-  -vendor_init
-  -traced_probes
-  -traced_perf
-} proc_kallsyms:file { open read };
-
 # Init can't do anything with binder calls. If this neverallow rule is being
 # triggered, it's probably due to a service with no SELinux domain.
 neverallow * init:binder *;
@@ -1074,6 +1063,9 @@ neverallow {
 # the tombstoned intercept socket.
 neverallow { domain -dumpstate -incidentd -system_server } tombstoned_intercept_socket:sock_file write;
 neverallow { domain -dumpstate -incidentd -system_server } tombstoned_intercept_socket:unix_stream_socket connectto;
+
+# Never allow anyone but system_server to read heapdumps in /data/system/heapdump.
+neverallow { domain -init -system_server } heapdump_data_file:file read;
 
 # Android does not support System V IPCs.
 #

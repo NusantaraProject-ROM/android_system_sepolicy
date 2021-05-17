@@ -201,7 +201,7 @@ neverallow {
 # do not change between system_server staging the files and apexd processing
 # the files.
 neverallow { domain -init -system_server -apexd -installd -iorap_inode2filename -priv_app } staging_data_file:dir *;
-neverallow { domain -init -system_app -system_server -apexd -kernel -installd -iorap_inode2filename -priv_app } staging_data_file:file *;
+neverallow { domain -init -system_app -system_server -apexd -adbd -kernel -installd -iorap_inode2filename -priv_app } staging_data_file:file *;
 neverallow { domain -init -system_server -installd} staging_data_file:dir no_w_dir_perms;
 # apexd needs the link and unlink permissions, so list every `no_w_file_perms`
 # except for `link` and `unlink`.
@@ -489,3 +489,24 @@ neverallow domain mlsvendorcompat:process fork;
 # Only init and otapreopt_chroot should be mounting filesystems on locations
 # labeled system or vendor (/product and /vendor respectively).
 neverallow { domain -init -otapreopt_chroot } { system_file_type vendor_file_type }:dir_file_class_set mounton;
+
+# Only allow init and vendor_init to read/write mm_events properties
+# NOTE: dumpstate is allowed to read any system property
+neverallow {
+  domain
+  -init
+  -vendor_init
+  -dumpstate
+} mm_events_config_prop:file no_rw_file_perms;
+
+# Allow the tracing daemon and callstack sampler to use kallsyms to symbolize
+# kernel traces. Addresses are not disclosed, they are repalced with symbol
+# names (if available). Traces don't disclose KASLR.
+neverallow {
+  domain
+  -init
+  userdebug_or_eng(`-profcollectd')
+  -vendor_init
+  -traced_probes
+  -traced_perf
+} proc_kallsyms:file { open read };
