@@ -414,8 +414,6 @@ endif  # with_asan
 ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
 LOCAL_REQUIRED_MODULES += \
     sepolicy_freeze_test \
-    sepolicy_system_ext_freeze_test \
-    sepolicy_product_freeze_test
 
 else
 ifneq (,$(FREEZE_TEST_EXTRA_DIRS)$(FREEZE_TEST_EXTRA_PREBUILT_DIRS))
@@ -1587,79 +1585,6 @@ base_plat_public_prebuilt :=
 base_plat_private_prebuilt :=
 all_frozen_files :=
 
-####################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := sepolicy_system_ext_freeze_test
-LOCAL_MODULE_CLASS := FAKE
-LOCAL_MODULE_TAGS := optional
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-base_system_ext_public := $(SYSTEM_EXT_PATH)/generic/public $(SYSTEM_EXT_PATH)/qva/public
-base_system_ext_private := $(SYSTEM_EXT_PATH)/generic/private $(SYSTEM_EXT_PATH)/qva/private
-base_system_ext_public_prebuilt := \
-  $(SYSTEM_EXT_PATH)/generic/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public \
-  $(SYSTEM_EXT_PATH)/qva/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public
-base_system_ext_private_prebuilt := \
-  $(SYSTEM_EXT_PATH)/generic/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private \
-  $(SYSTEM_EXT_PATH)/qva/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private
-
-all_frozen_files := $(call build_policy,$(sepolicy_build_files), \
-$(base_system_ext_public) $(base_system_ext_private) $(base_system_ext_public_prebuilt) $(base_system_ext_private_prebuilt))
-
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC := $(base_system_ext_public)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE := $(base_system_ext_private)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC_PREBUILT := $(base_system_ext_public_prebuilt)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE_PREBUILT := $(base_system_ext_private_prebuilt)
-$(LOCAL_BUILT_MODULE): $(all_frozen_files)
-ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PUBLIC_PREBUILT) $(PRIVATE_BASE_PLAT_PUBLIC)
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PRIVATE_PREBUILT) $(PRIVATE_BASE_PLAT_PRIVATE)
-endif # ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-	$(hide) touch $@
-
-base_system_ext_public :=
-base_system_ext_private :=
-base_system_ext_public_prebuilt :=
-base_system_ext_private_prebuilt :=
-all_frozen_files :=
-
-#########################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := sepolicy_product_freeze_test
-LOCAL_MODULE_CLASS := FAKE
-LOCAL_MODULE_TAGS := optional
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-base_product_public := $(PRODUCT_PATH)/generic/product/public $(PRODUCT_PATH)/qva/product/public
-base_product_private := $(PRODUCT_PATH)/generic/product/private $(PRODUCT_PATH)/qva/product/private
-base_product_public_prebuilt := \
-  $(PRODUCT_PATH)/generic/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public \
-  $(PRODUCT_PATH)/qva/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public
-base_product_private_prebuilt := \
-  $(PRODUCT_PATH)/generic/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private \
-  $(PRODUCT_PATH)/qva/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private
-
-all_frozen_files := $(call build_policy,$(sepolicy_build_files), \
-$(base_product_public) $(base_product_private) $(base_product_public_prebuilt) $(base_product_private_prebuilt))
-
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC := $(base_product_public)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE := $(base_product_private)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC_PREBUILT := $(base_product_public_prebuilt)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE_PREBUILT := $(base_product_private_prebuilt)
-$(LOCAL_BUILT_MODULE): $(all_frozen_files)
-ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PUBLIC_PREBUILT) $(PRIVATE_BASE_PLAT_PUBLIC)
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PRIVATE_PREBUILT) $(PRIVATE_BASE_PLAT_PRIVATE)
-endif # ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-	$(hide) touch $@
-
-base_product_public :=
-base_product_private :=
-base_product_public_prebuilt :=
-base_product_private_prebuilt :=
-all_frozen_files :=
 #################################
 
 
