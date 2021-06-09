@@ -26,9 +26,6 @@ allow system_server appdomain_tmpfs:file { getattr map read write };
 # For Incremental Service to check if incfs is available
 allow system_server proc_filesystems:file r_file_perms;
 
-# Access the IncFS list of features
-r_dir_file(system_server, sysfs_fs_incfs_features);
-
 # To create files, get permission to fill blocks, and configure Incremental File System
 allow system_server incremental_control_file:file { ioctl r_file_perms };
 allowxperm system_server incremental_control_file:file ioctl {
@@ -37,6 +34,7 @@ allowxperm system_server incremental_control_file:file ioctl {
   INCFS_IOCTL_PERMIT_FILL
   INCFS_IOCTL_GET_READ_TIMEOUTS
   INCFS_IOCTL_SET_READ_TIMEOUTS
+  INCFS_IOCTL_GET_LAST_READ_ERROR
 };
 
 # To get signature of an APK installed on Incremental File System, and fill in data
@@ -47,6 +45,9 @@ allowxperm system_server apk_data_file:file ioctl {
   INCFS_IOCTL_GET_FILLED_BLOCKS
   INCFS_IOCTL_GET_BLOCK_COUNT
 };
+
+# For Incremental Service to check incfs metrics
+allow system_server sysfs_fs_incfs_metrics:file r_file_perms;
 
 # For art.
 allow system_server { apex_art_data_file dalvikcache_data_file }:dir r_dir_perms;
@@ -186,7 +187,9 @@ allow system_server stats_data_file:dir { open read remove_name search write };
 allow system_server stats_data_file:file unlink;
 
 # Read /sys/kernel/debug/wakeup_sources.
-allow system_server debugfs_wakeup_sources:file r_file_perms;
+no_debugfs_restriction(`
+  allow system_server debugfs_wakeup_sources:file r_file_perms;
+')
 
 # Read /sys/kernel/ion/*.
 allow system_server sysfs_ion:file r_file_perms;
@@ -316,6 +319,7 @@ allow system_server {
   drmserver
   gpuservice
   inputflinger
+  keystore
   mediadrmserver
   mediaextractor
   mediametrics
@@ -632,6 +636,7 @@ allow system_server server_configurable_flags_data_file:file r_file_perms;
 
 # Property Service write
 set_prop(system_server, system_prop)
+set_prop(system_server, bootanim_system_prop)
 set_prop(system_server, exported_system_prop)
 set_prop(system_server, exported3_system_prop)
 set_prop(system_server, safemode_prop)

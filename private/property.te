@@ -26,6 +26,7 @@ system_internal_prop(odsign_prop)
 system_internal_prop(perf_drop_caches_prop)
 system_internal_prop(pm_prop)
 system_internal_prop(profcollectd_node_id_prop)
+system_internal_prop(radio_cdma_ecm_prop)
 system_internal_prop(rollback_test_prop)
 system_internal_prop(setupwizard_prop)
 system_internal_prop(system_adbd_prop)
@@ -34,7 +35,7 @@ system_internal_prop(userspace_reboot_log_prop)
 system_internal_prop(userspace_reboot_test_prop)
 system_internal_prop(verity_status_prop)
 system_internal_prop(zygote_wrap_prop)
-
+vendor_restricted_prop(vendor_medsrv_set_64b)
 ###
 ### Neverallow rules
 ###
@@ -545,6 +546,13 @@ neverallow {
   domain
   -init
 } zygote_wrap_prop:property_service set;
+
+neverallow {
+  domain
+  -init
+  -dumpstate
+  -vendor_init
+} vendor_medsrv_set_64b:property_service set;
 
 neverallow {
   domain

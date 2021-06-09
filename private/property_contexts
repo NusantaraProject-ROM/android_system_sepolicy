@@ -81,6 +81,7 @@ persist.heapprofd.enable u:object_r:heapprofd_enabled_prop:s0
 persist.traced_perf.enable u:object_r:traced_perf_enabled_prop:s0
 persist.vendor.debug.wifi. u:object_r:persist_vendor_debug_wifi_prop:s0
 persist.vendor.overlay.  u:object_r:overlay_prop:s0
+ril.cdma.inecmmode      u:object_r:radio_cdma_ecm_prop:s0 exact bool
 ro.boot.vendor.overlay.  u:object_r:overlay_prop:s0
 ro.boottime.             u:object_r:boottime_prop:s0
 ro.serialno             u:object_r:serialno_prop:s0
@@ -312,8 +313,9 @@ audio.deep_buffer.media         u:object_r:audio_config_prop:s0 exact bool
 audio.offload.video             u:object_r:audio_config_prop:s0 exact bool
 audio.offload.min.duration.secs u:object_r:audio_config_prop:s0 exact int
 
-ro.audio.ignore_effects  u:object_r:audio_config_prop:s0 exact bool
-ro.audio.monitorRotation u:object_r:audio_config_prop:s0 exact bool
+ro.audio.ignore_effects   u:object_r:audio_config_prop:s0 exact bool
+ro.audio.monitorRotation  u:object_r:audio_config_prop:s0 exact bool
+ro.audio.offload_wakelock u:object_r:audio_config_prop:s0 exact bool
 
 persist.config.calibration_fac u:object_r:camera_calibration_prop:s0 exact string
 
@@ -394,6 +396,8 @@ dalvik.vm.method-trace-file-siz               u:object_r:dalvik_config_prop:s0 e
 dalvik.vm.method-trace-stream                 u:object_r:dalvik_config_prop:s0 exact bool
 dalvik.vm.profilesystemserver                 u:object_r:dalvik_config_prop:s0 exact bool
 dalvik.vm.profilebootclasspath                u:object_r:dalvik_config_prop:s0 exact bool
+dalvik.vm.ps-min-save-period-ms               u:object_r:dalvik_config_prop:s0 exact int
+dalvik.vm.ps-resolved-classes-delay-ms        u:object_r:dalvik_config_prop:s0 exact int
 dalvik.vm.restore-dex2oat-cpu-set             u:object_r:dalvik_config_prop:s0 exact string
 dalvik.vm.restore-dex2oat-threads             u:object_r:dalvik_config_prop:s0 exact int
 dalvik.vm.usejit                              u:object_r:dalvik_config_prop:s0 exact bool
@@ -435,6 +439,7 @@ ro.hdmi.cec_audio_device_forward_volume_keys_system_audio_mode_off u:object_r:hd
 ro.hdmi.property_is_device_hdmi_cec_switch                         u:object_r:hdmi_config_prop:s0 exact bool
 ro.hdmi.wake_on_hotplug                                            u:object_r:hdmi_config_prop:s0 exact bool
 ro.hdmi.cec.source.send_standby_on_sleep                           u:object_r:hdmi_config_prop:s0 exact enum to_tv broadcast none
+ro.hdmi.cec.source.playback_device_action_on_routing_control       u:object_r:hdmi_config_prop:s0 exact enum none wake_up_only wake_up_and_send_active_source
 
 pm.dexopt.ab-ota                            u:object_r:exported_pm_prop:s0 exact string
 pm.dexopt.bg-dexopt                         u:object_r:exported_pm_prop:s0 exact string
@@ -560,7 +565,7 @@ sys.usb.ffs.mtp.ready u:object_r:ffs_control_prop:s0 exact bool
 
 tombstoned.max_tombstone_count u:object_r:tombstone_config_prop:s0 exact int
 
-vold.post_fs_data_done u:object_r:vold_config_prop:s0 exact int
+vold.post_fs_data_done u:object_r:vold_post_fs_data_prop:s0 exact int
 
 apexd.status u:object_r:apexd_prop:s0 exact enum starting activated ready
 
@@ -798,16 +803,22 @@ ro.vendor_dlkm.build.version.release_or_codename u:object_r:build_vendor_prop:s0
 ro.vendor_dlkm.build.version.sdk                 u:object_r:build_vendor_prop:s0 exact int
 
 # All odm_dlkm build props are set by /odm_dlkm/etc/build.prop
-ro.old_dlkm.build.date                        u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.date.utc                    u:object_r:build_vendor_prop:s0 exact int
-ro.old_dlkm.build.fingerprint                 u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.id                          u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.tags                        u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.type                        u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.version.incremental         u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.version.release             u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.version.release_or_codename u:object_r:build_vendor_prop:s0 exact string
-ro.old_dlkm.build.version.sdk                 u:object_r:build_vendor_prop:s0 exact int
+ro.product.odm_dlkm.brand        u:object_r:build_odm_prop:s0 exact string
+ro.product.odm_dlkm.device       u:object_r:build_odm_prop:s0 exact string
+ro.product.odm_dlkm.manufacturer u:object_r:build_odm_prop:s0 exact string
+ro.product.odm_dlkm.model        u:object_r:build_odm_prop:s0 exact string
+ro.product.odm_dlkm.name         u:object_r:build_odm_prop:s0 exact string
+
+ro.odm_dlkm.build.date                        u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.date.utc                    u:object_r:build_odm_prop:s0 exact int
+ro.odm_dlkm.build.fingerprint                 u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.id                          u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.tags                        u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.type                        u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.version.incremental         u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.version.release             u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.version.release_or_codename u:object_r:build_odm_prop:s0 exact string
+ro.odm_dlkm.build.version.sdk                 u:object_r:build_odm_prop:s0 exact int
 
 # enforces debugfs restrictions in non-user builds, set by /vendor/build.prop
 ro.product.debugfs_restrictions.enabled u:object_r:debugfs_restriction_prop:s0 exact bool
@@ -829,13 +840,18 @@ ro.vendor.product.cpu.abilist   u:object_r:build_vendor_prop:s0 exact string
 ro.vendor.product.cpu.abilist32 u:object_r:build_vendor_prop:s0 exact string
 ro.vendor.product.cpu.abilist64 u:object_r:build_vendor_prop:s0 exact string
 
-ro.product.board               u:object_r:build_vendor_prop:s0 exact string
-ro.product.first_api_level     u:object_r:build_vendor_prop:s0 exact int
-ro.product.vendor.brand        u:object_r:build_vendor_prop:s0 exact string
-ro.product.vendor.device       u:object_r:build_vendor_prop:s0 exact string
-ro.product.vendor.manufacturer u:object_r:build_vendor_prop:s0 exact string
-ro.product.vendor.model        u:object_r:build_vendor_prop:s0 exact string
-ro.product.vendor.name         u:object_r:build_vendor_prop:s0 exact string
+ro.product.board                    u:object_r:build_vendor_prop:s0 exact string
+ro.product.first_api_level          u:object_r:build_vendor_prop:s0 exact int
+ro.product.vendor.brand             u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor.device            u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor.manufacturer      u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor.model             u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor.name              u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor_dlkm.brand        u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor_dlkm.device       u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor_dlkm.manufacturer u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor_dlkm.model        u:object_r:build_vendor_prop:s0 exact string
+ro.product.vendor_dlkm.name         u:object_r:build_vendor_prop:s0 exact string
 
 # GRF property for the first api level of the vendor partition
 ro.board.first_api_level u:object_r:build_vendor_prop:s0 exact int
@@ -869,8 +885,8 @@ ro.property_service.version u:object_r:property_service_version_prop:s0 exact in
 
 ro.vendor.redirect_socket_calls u:object_r:vendor_socket_hook_prop:s0 exact bool
 
-service.bootanim.exit u:object_r:exported_system_prop:s0 exact int
-service.bootanim.progress u:object_r:exported_system_prop:s0 exact int
+service.bootanim.exit u:object_r:bootanim_system_prop:s0 exact int
+service.bootanim.progress u:object_r:bootanim_system_prop:s0 exact int
 
 sys.init.userspace_reboot.in_progress u:object_r:userspace_reboot_exported_prop:s0 exact bool
 sys.use_memfd                         u:object_r:use_memfd_prop:s0 exact bool
@@ -1041,6 +1057,7 @@ ro.surface_flinger.refresh_rate_switching                 u:object_r:surfaceflin
 ro.surface_flinger.update_device_product_info_on_hotplug_reconnect u:object_r:surfaceflinger_prop:s0 exact bool
 ro.surface_flinger.enable_frame_rate_override             u:object_r:surfaceflinger_prop:s0 exact bool
 ro.surface_flinger.enable_layer_caching                   u:object_r:surfaceflinger_prop:s0 exact bool
+ro.surface_flinger.display_update_imminent_timeout_ms     u:object_r:surfaceflinger_prop:s0 exact int
 
 ro.sf.disable_triple_buffer u:object_r:surfaceflinger_prop:s0 exact bool
 ro.sf.lcd_density           u:object_r:surfaceflinger_prop:s0 exact int
@@ -1169,3 +1186,6 @@ persist.rollback.is_test u:object_r:rollback_test_prop:s0 exact bool
 
 # bootanimation properties
 ro.bootanim.quiescent.enabled u:object_r:bootanim_config_prop:s0 exact bool
+
+# mediaserverwrapper
+ro.mediaserver.64b.enable   u:object_r:vendor_medsrv_set_64b:s0 exact bool

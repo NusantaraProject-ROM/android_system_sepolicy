@@ -301,6 +301,11 @@ ifeq ($(BUILD_BROKEN_ENFORCE_SYSPROP_OWNER),true)
   enforce_sysprop_owner := false
 endif
 
+enforce_debugfs_restriction := false
+ifeq ($(PRODUCT_SET_DEBUGFS_RESTRICTIONS),true)
+  enforce_debugfs_restriction := true
+endif
+
 ifeq ($(PRODUCT_SHIPPING_API_LEVEL),)
   #$(warning no product shipping level defined)
 else ifneq ($(call math_lt,30,$(PRODUCT_SHIPPING_API_LEVEL)),)
@@ -409,8 +414,6 @@ endif  # with_asan
 ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
 LOCAL_REQUIRED_MODULES += \
     sepolicy_freeze_test \
-    sepolicy_system_ext_freeze_test \
-    sepolicy_product_freeze_test
 
 else
 ifneq (,$(FREEZE_TEST_EXTRA_DIRS)$(FREEZE_TEST_EXTRA_PREBUILT_DIRS))
@@ -431,7 +434,9 @@ LOCAL_LICENSE_CONDITIONS := notice unencumbered
 LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
 # Include precompiled policy, unless told otherwise.
 ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
+ifdef HAS_SYSTEM_EXT_SEPOLICY
 LOCAL_REQUIRED_MODULES += system_ext_sepolicy_and_mapping.sha256
+endif
 endif
 
 ifdef HAS_SYSTEM_EXT_SEPOLICY
@@ -476,7 +481,9 @@ LOCAL_LICENSE_CONDITIONS := notice unencumbered
 LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
 # Include precompiled policy, unless told otherwise.
 ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
+ifdef HAS_PRODUCT_SEPOLICY
 LOCAL_REQUIRED_MODULES += product_sepolicy_and_mapping.sha256
+endif
 endif
 
 ifdef HAS_PRODUCT_SEPOLICY
@@ -522,9 +529,15 @@ LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
 ifneq ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
 LOCAL_REQUIRED_MODULES += \
     precompiled_sepolicy \
-    precompiled_sepolicy.plat_sepolicy_and_mapping.sha256 \
-    precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256 \
-    precompiled_sepolicy.product_sepolicy_and_mapping.sha256 \
+    precompiled_sepolicy.plat_sepolicy_and_mapping.sha256
+
+ifdef HAS_SYSTEM_EXT_SEPOLICY
+LOCAL_REQUIRED_MODULES += precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256
+endif
+
+ifdef HAS_PRODUCT_SEPOLICY
+LOCAL_REQUIRED_MODULES += precompiled_sepolicy.product_sepolicy_and_mapping.sha256
+endif
 
 endif # ($(PRODUCT_PRECOMPILED_SEPOLICY),false)
 
@@ -623,6 +636,7 @@ $(sepolicy_policy.conf): PRIVATE_TGT_WITH_ASAN := $(with_asan)
 $(sepolicy_policy.conf): PRIVATE_TGT_WITH_NATIVE_COVERAGE := $(with_native_coverage)
 $(sepolicy_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(sepolicy_policy.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
+$(sepolicy_policy.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(sepolicy_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(sepolicy_policy.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -640,6 +654,7 @@ $(sepolicy_policy_2.conf): PRIVATE_TGT_WITH_ASAN := $(with_asan)
 $(sepolicy_policy_2.conf): PRIVATE_TGT_WITH_NATIVE_COVERAGE := $(with_native_coverage)
 $(sepolicy_policy_2.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(sepolicy_policy_2.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
+$(sepolicy_policy_2.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(sepolicy_policy_2.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(sepolicy_policy_2.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -698,6 +713,7 @@ $(sepolicy_policy.conf): PRIVATE_TGT_WITH_ASAN := $(with_asan)
 $(sepolicy_policy.conf): PRIVATE_TGT_WITH_NATIVE_COVERAGE := $(with_native_coverage)
 $(sepolicy_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(sepolicy_policy.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
+$(sepolicy_policy.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(sepolicy_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(sepolicy_policy.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -715,6 +731,7 @@ $(sepolicy_policy_2.conf): PRIVATE_TGT_WITH_ASAN := $(with_asan)
 $(sepolicy_policy_2.conf): PRIVATE_TGT_WITH_NATIVE_COVERAGE := $(with_native_coverage)
 $(sepolicy_policy_2.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(sepolicy_policy_2.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
+$(sepolicy_policy_2.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(sepolicy_policy_2.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(sepolicy_policy_2.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -787,74 +804,6 @@ CHECKPOLICY_ASAN_OPTIONS := ASAN_OPTIONS=detect_leaks=0
 #################################
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := userdebug_plat_sepolicy.cil
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_PATH := $(TARGET_DEBUG_RAMDISK_OUT)
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-# userdebug_plat_policy.conf - the userdebug version plat_sepolicy.cil
-policy_files := $(call build_policy, $(sepolicy_build_files), \
-  $(PLAT_PUBLIC_POLICY) $(PLAT_PRIVATE_POLICY))
-userdebug_plat_policy.conf := $(intermediates)/userdebug_plat_policy.conf
-$(userdebug_plat_policy.conf): PRIVATE_MLS_SENS := $(MLS_SENS)
-$(userdebug_plat_policy.conf): PRIVATE_MLS_CATS := $(MLS_CATS)
-$(userdebug_plat_policy.conf): PRIVATE_TARGET_BUILD_VARIANT := userdebug
-$(userdebug_plat_policy.conf): PRIVATE_TGT_ARCH := $(my_target_arch)
-$(userdebug_plat_policy.conf): PRIVATE_TGT_WITH_ASAN := $(with_asan)
-$(userdebug_plat_policy.conf): PRIVATE_TGT_WITH_NATIVE_COVERAGE := $(with_native_coverage)
-$(userdebug_plat_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
-$(userdebug_plat_policy.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
-$(userdebug_plat_policy.conf): PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
-$(userdebug_plat_policy.conf): PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
-$(userdebug_plat_policy.conf): PRIVATE_ENFORCE_SYSPROP_OWNER := $(enforce_sysprop_owner)
-$(userdebug_plat_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
-$(userdebug_plat_policy.conf): $(policy_files) $(M4)
-	$(transform-policy-to-conf)
-	$(hide) sed '/^\s*dontaudit.*;/d' $@ | sed '/^\s*dontaudit/,/;/d' > $@.dontaudit
-
-$(LOCAL_BUILT_MODULE): PRIVATE_ADDITIONAL_CIL_FILES := \
-  $(call build_policy, $(sepolicy_build_cil_workaround_files), $(PLAT_PRIVATE_POLICY))
-$(LOCAL_BUILT_MODULE): PRIVATE_NEVERALLOW_ARG := $(NEVERALLOW_ARG)
-$(LOCAL_BUILT_MODULE): $(userdebug_plat_policy.conf) $(HOST_OUT_EXECUTABLES)/checkpolicy \
-  $(HOST_OUT_EXECUTABLES)/secilc \
-  $(call build_policy, $(sepolicy_build_cil_workaround_files), $(PLAT_PRIVATE_POLICY)) \
-  $(built_sepolicy_neverallows)
-	@mkdir -p $(dir $@)
-	$(hide) $(CHECKPOLICY_ASAN_OPTIONS) $(HOST_OUT_EXECUTABLES)/checkpolicy -M -C -c \
-		$(POLICYVERS) -o $@.tmp $<
-	$(hide) cat $(PRIVATE_ADDITIONAL_CIL_FILES) >> $@.tmp
-	$(hide) $(HOST_OUT_EXECUTABLES)/secilc -m -M true -G -c $(POLICYVERS) $(PRIVATE_NEVERALLOW_ARG) $@.tmp -o /dev/null -f /dev/null
-	$(hide) mv $@.tmp $@
-
-userdebug_plat_policy.conf :=
-
-#################################
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := plat_sepolicy_vers.txt
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-LOCAL_PROPRIETARY_MODULE := true
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE) : PRIVATE_PLAT_SEPOL_VERS := $(BOARD_SEPOLICY_VERS)
-$(LOCAL_BUILT_MODULE) :
-	mkdir -p $(dir $@)
-	echo $(PRIVATE_PLAT_SEPOL_VERS) > $@
-
-#################################
-include $(CLEAR_VARS)
-
 # vendor_policy.cil - the vendor sepolicy. This needs attributization and to be combined
 # with the platform-provided policy.  It makes use of the reqd_policy_mask files from private
 # policy and the platform public policy files in order to use checkpolicy.
@@ -886,6 +835,7 @@ $(vendor_policy.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
 $(vendor_policy.conf): PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
 $(vendor_policy.conf): PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
 $(vendor_policy.conf): PRIVATE_ENFORCE_SYSPROP_OWNER := $(enforce_sysprop_owner)
+$(vendor_policy.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(vendor_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(vendor_policy.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -949,6 +899,7 @@ $(odm_policy.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(odm_policy.conf): PRIVATE_SEPOLICY_SPLIT := $(PRODUCT_SEPOLICY_SPLIT)
 $(odm_policy.conf): PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
 $(odm_policy.conf): PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
+$(odm_policy.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(odm_policy.conf): PRIVATE_ENFORCE_SYSPROP_OWNER := $(enforce_sysprop_owner)
 $(odm_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(odm_policy.conf): $(policy_files) $(M4)
@@ -1052,78 +1003,6 @@ all_cil_files :=
 #################################
 
 #################################
-# SHA-256 digest of the plat_sepolicy.cil and plat_mapping_file against
-# which precompiled_policy was built.
-#################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := precompiled_sepolicy.plat_sepolicy_and_mapping.sha256
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-
-ifeq ($(BOARD_USES_ODMIMAGE),true)
-LOCAL_MODULE_PATH := $(TARGET_OUT_ODM)/etc/selinux
-else
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-endif
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE): PRIVATE_CIL_FILES := $(built_plat_cil) $(built_plat_mapping_cil)
-$(LOCAL_BUILT_MODULE): $(built_precompiled_sepolicy) $(built_plat_cil) $(built_plat_mapping_cil)
-	cat $(PRIVATE_CIL_FILES) | sha256sum | cut -d' ' -f1 > $@
-
-#################################
-# SHA-256 digest of the system_ext_sepolicy.cil and system_ext_mapping_file against
-# which precompiled_policy was built.
-#################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-
-ifeq ($(BOARD_USES_ODMIMAGE),true)
-LOCAL_MODULE_PATH := $(TARGET_OUT_ODM)/etc/selinux
-else
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-endif
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE): PRIVATE_CIL_FILES := $(built_system_ext_cil) $(built_system_ext_mapping_cil)
-$(LOCAL_BUILT_MODULE): $(built_precompiled_sepolicy) $(built_system_ext_cil) $(built_system_ext_mapping_cil)
-	cat $(PRIVATE_CIL_FILES) | sha256sum | cut -d' ' -f1 > $@
-
-#################################
-# SHA-256 digest of the product_sepolicy.cil and product_mapping_file against
-# which precompiled_policy was built.
-#################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := precompiled_sepolicy.product_sepolicy_and_mapping.sha256
-LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0 legacy_unencumbered
-LOCAL_LICENSE_CONDITIONS := notice unencumbered
-LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
-LOCAL_MODULE_CLASS := ETC
-LOCAL_MODULE_TAGS := optional
-
-ifeq ($(BOARD_USES_ODMIMAGE),true)
-LOCAL_MODULE_PATH := $(TARGET_OUT_ODM)/etc/selinux
-else
-LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/selinux
-endif
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-$(LOCAL_BUILT_MODULE): PRIVATE_CIL_FILES := $(built_product_cil) $(built_product_mapping_cil)
-$(LOCAL_BUILT_MODULE): $(built_precompiled_sepolicy) $(built_product_cil) $(built_product_mapping_cil)
-	cat $(PRIVATE_CIL_FILES) | sha256sum | cut -d' ' -f1 > $@
-
-#################################
 include $(CLEAR_VARS)
 # build this target so that we can still perform neverallow checks
 
@@ -1215,6 +1094,7 @@ $(sepolicy.recovery.conf): PRIVATE_TGT_WITH_ASAN := $(with_asan)
 $(sepolicy.recovery.conf): PRIVATE_TGT_WITH_NATIVE_COVERAGE := $(with_native_coverage)
 $(sepolicy.recovery.conf): PRIVATE_ADDITIONAL_M4DEFS := $(LOCAL_ADDITIONAL_M4DEFS)
 $(sepolicy.recovery.conf): PRIVATE_TGT_RECOVERY := -D target_recovery=true
+$(sepolicy.recovery.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(sepolicy.recovery.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(sepolicy.recovery.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -1452,6 +1332,7 @@ $(base_plat_policy.conf): PRIVATE_SEPOLICY_SPLIT := true
 $(base_plat_policy.conf): PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
 $(base_plat_policy.conf): PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
 $(base_plat_policy.conf): PRIVATE_ENFORCE_SYSPROP_OWNER := $(enforce_sysprop_owner)
+$(base_plat_policy.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(base_plat_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(base_plat_policy.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -1484,6 +1365,7 @@ $(base_plat_pub_policy.conf): PRIVATE_SEPOLICY_SPLIT := true
 $(base_plat_pub_policy.conf): PRIVATE_COMPATIBLE_PROPERTY := $(PRODUCT_COMPATIBLE_PROPERTY)
 $(base_plat_pub_policy.conf): PRIVATE_TREBLE_SYSPROP_NEVERALLOW := $(treble_sysprop_neverallow)
 $(base_plat_pub_policy.conf): PRIVATE_ENFORCE_SYSPROP_OWNER := $(enforce_sysprop_owner)
+$(base_plat_pub_policy.conf): PRIVATE_ENFORCE_DEBUGFS_RESTRICTION := $(enforce_debugfs_restriction)
 $(base_plat_pub_policy.conf): PRIVATE_POLICY_FILES := $(policy_files)
 $(base_plat_pub_policy.conf): $(policy_files) $(M4)
 	$(transform-policy-to-conf)
@@ -1703,79 +1585,6 @@ base_plat_public_prebuilt :=
 base_plat_private_prebuilt :=
 all_frozen_files :=
 
-####################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := sepolicy_system_ext_freeze_test
-LOCAL_MODULE_CLASS := FAKE
-LOCAL_MODULE_TAGS := optional
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-base_system_ext_public := $(SYSTEM_EXT_PATH)/generic/public $(SYSTEM_EXT_PATH)/qva/public
-base_system_ext_private := $(SYSTEM_EXT_PATH)/generic/private $(SYSTEM_EXT_PATH)/qva/private
-base_system_ext_public_prebuilt := \
-  $(SYSTEM_EXT_PATH)/generic/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public \
-  $(SYSTEM_EXT_PATH)/qva/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public
-base_system_ext_private_prebuilt := \
-  $(SYSTEM_EXT_PATH)/generic/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private \
-  $(SYSTEM_EXT_PATH)/qva/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private
-
-all_frozen_files := $(call build_policy,$(sepolicy_build_files), \
-$(base_system_ext_public) $(base_system_ext_private) $(base_system_ext_public_prebuilt) $(base_system_ext_private_prebuilt))
-
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC := $(base_system_ext_public)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE := $(base_system_ext_private)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC_PREBUILT := $(base_system_ext_public_prebuilt)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE_PREBUILT := $(base_system_ext_private_prebuilt)
-$(LOCAL_BUILT_MODULE): $(all_frozen_files)
-ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PUBLIC_PREBUILT) $(PRIVATE_BASE_PLAT_PUBLIC)
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PRIVATE_PREBUILT) $(PRIVATE_BASE_PLAT_PRIVATE)
-endif # ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-	$(hide) touch $@
-
-base_system_ext_public :=
-base_system_ext_private :=
-base_system_ext_public_prebuilt :=
-base_system_ext_private_prebuilt :=
-all_frozen_files :=
-
-#########################################
-include $(CLEAR_VARS)
-LOCAL_MODULE := sepolicy_product_freeze_test
-LOCAL_MODULE_CLASS := FAKE
-LOCAL_MODULE_TAGS := optional
-
-include $(BUILD_SYSTEM)/base_rules.mk
-
-base_product_public := $(PRODUCT_PATH)/generic/product/public $(PRODUCT_PATH)/qva/product/public
-base_product_private := $(PRODUCT_PATH)/generic/product/private $(PRODUCT_PATH)/qva/product/private
-base_product_public_prebuilt := \
-  $(PRODUCT_PATH)/generic/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public \
-  $(PRODUCT_PATH)/qva/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/public
-base_product_private_prebuilt := \
-  $(PRODUCT_PATH)/generic/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private \
-  $(PRODUCT_PATH)/qva/product/prebuilts/api/$(PLATFORM_SEPOLICY_VERSION)/private
-
-all_frozen_files := $(call build_policy,$(sepolicy_build_files), \
-$(base_product_public) $(base_product_private) $(base_product_public_prebuilt) $(base_product_private_prebuilt))
-
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC := $(base_product_public)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE := $(base_product_private)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PUBLIC_PREBUILT := $(base_product_public_prebuilt)
-$(LOCAL_BUILT_MODULE): PRIVATE_BASE_PLAT_PRIVATE_PREBUILT := $(base_product_private_prebuilt)
-$(LOCAL_BUILT_MODULE): $(all_frozen_files)
-ifneq ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PUBLIC_PREBUILT) $(PRIVATE_BASE_PLAT_PUBLIC)
-        @diff -rq -x bug_map $(PRIVATE_BASE_PLAT_PRIVATE_PREBUILT) $(PRIVATE_BASE_PLAT_PRIVATE)
-endif # ($(PLATFORM_SEPOLICY_VERSION),$(TOT_SEPOLICY_VERSION))
-	$(hide) touch $@
-
-base_product_public :=
-base_product_private :=
-base_product_public_prebuilt :=
-base_product_private_prebuilt :=
-all_frozen_files :=
 #################################
 
 
@@ -1799,6 +1608,7 @@ built_vendor_svc :=
 built_plat_sepolicy :=
 treble_sysprop_neverallow :=
 enforce_sysprop_owner :=
+enforce_debugfs_restriction :=
 mapping_policy :=
 my_target_arch :=
 pub_policy.cil :=

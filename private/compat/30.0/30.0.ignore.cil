@@ -17,6 +17,9 @@
     app_hibernation_service
     appcompat_data_file
     arm64_memtag_prop
+    artd
+    artd_exec
+    artd_service
     authorization_service
     bootanim_config_prop
     camerax_extensions_prop
@@ -136,6 +139,7 @@
     vcn_management_service
     vd_device
     vendor_kernel_modules
+    vendor_modprobe
     vibrator_manager_service
     virtualization_service
     vpn_management_service
