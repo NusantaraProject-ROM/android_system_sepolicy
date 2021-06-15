@@ -169,6 +169,9 @@ ctl.restart$gsid        u:object_r:ctl_gsid_prop:s0
 # Restrict access to stopping apexd.
 ctl.stop$apexd          u:object_r:ctl_apexd_prop:s0
 
+# Restrict access to starting media.transcoding.
+ctl.start$media.transcoding  u:object_r:ctl_mediatranscoding_prop:s0
+
 # Restrict access to restart dumpstate
 ctl.interface_restart$android.hardware.dumpstate u:object_r:ctl_dumpstate_prop:s0
 
@@ -328,7 +331,13 @@ ro.camera.enableLazyHal u:object_r:camera_config_prop:s0 exact bool
 
 ro.camerax.extensions.enabled u:object_r:camerax_extensions_prop:s0 exact bool
 
-# Should always_debuggable be bool? It's checked against the string "1".
+# ART properties
+dalvik.vm.                 u:object_r:dalvik_config_prop:s0
+ro.dalvik.vm.              u:object_r:dalvik_config_prop:s0
+ro.zygote                  u:object_r:dalvik_config_prop:s0 exact string
+
+# A set of ART properties listed explicitly for compatibility purposes.
+ro.dalvik.vm.native.bridge u:object_r:dalvik_config_prop:s0 exact string
 dalvik.vm.always_debuggable                   u:object_r:dalvik_config_prop:s0 exact int
 dalvik.vm.appimageformat                      u:object_r:dalvik_config_prop:s0 exact string
 dalvik.vm.backgroundgctype                    u:object_r:dalvik_config_prop:s0 exact string
@@ -352,6 +361,7 @@ dalvik.vm.dex2oat-very-large                  u:object_r:dalvik_config_prop:s0 e
 dalvik.vm.dex2oat-swap                        u:object_r:dalvik_config_prop:s0 exact bool
 dalvik.vm.dex2oat64.enabled                   u:object_r:dalvik_config_prop:s0 exact bool
 dalvik.vm.dexopt.secondary                    u:object_r:dalvik_config_prop:s0 exact bool
+dalvik.vm.dexopt.thermal-cutoff               u:object_r:dalvik_config_prop:s0 exact int
 dalvik.vm.execution-mode                      u:object_r:dalvik_config_prop:s0 exact string
 dalvik.vm.extra-opts                          u:object_r:dalvik_config_prop:s0 exact string
 dalvik.vm.foreground-heap-growth-multiplier   u:object_r:dalvik_config_prop:s0 exact string
@@ -403,7 +413,6 @@ dalvik.vm.restore-dex2oat-threads             u:object_r:dalvik_config_prop:s0 e
 dalvik.vm.usejit                              u:object_r:dalvik_config_prop:s0 exact bool
 dalvik.vm.usejitprofiles                      u:object_r:dalvik_config_prop:s0 exact bool
 dalvik.vm.zygote.max-boot-retry               u:object_r:dalvik_config_prop:s0 exact int
-ro.zygote                                     u:object_r:dalvik_config_prop:s0 exact string
 
 persist.sys.dalvik.vm.lib.2 u:object_r:dalvik_runtime_prop:s0 exact string
 
@@ -444,6 +453,7 @@ ro.hdmi.cec.source.playback_device_action_on_routing_control       u:object_r:hd
 pm.dexopt.ab-ota                            u:object_r:exported_pm_prop:s0 exact string
 pm.dexopt.bg-dexopt                         u:object_r:exported_pm_prop:s0 exact string
 pm.dexopt.boot                              u:object_r:exported_pm_prop:s0 exact string
+pm.dexopt.cmdline                           u:object_r:exported_pm_prop:s0 exact string
 pm.dexopt.disable_bg_dexopt                 u:object_r:exported_pm_prop:s0 exact bool
 pm.dexopt.downgrade_after_inactive_days     u:object_r:exported_pm_prop:s0 exact int
 pm.dexopt.first-boot                        u:object_r:exported_pm_prop:s0 exact string
@@ -489,8 +499,6 @@ ro.crypto.volume.filenames_mode                 u:object_r:vold_config_prop:s0 e
 ro.crypto.volume.metadata.encryption            u:object_r:vold_config_prop:s0 exact string
 ro.crypto.volume.metadata.method                u:object_r:vold_config_prop:s0 exact string
 ro.crypto.volume.options                        u:object_r:vold_config_prop:s0 exact string
-
-ro.dalvik.vm.native.bridge u:object_r:dalvik_config_prop:s0 exact string
 
 external_storage.projid.enabled   u:object_r:storage_config_prop:s0 exact bool
 external_storage.casefold.enabled u:object_r:storage_config_prop:s0 exact bool
@@ -1187,6 +1195,8 @@ persist.rollback.is_test u:object_r:rollback_test_prop:s0 exact bool
 # bootanimation properties
 ro.bootanim.quiescent.enabled u:object_r:bootanim_config_prop:s0 exact bool
 
+# dck properties
+ro.gms.dck.eligible_wcc u:object_r:dck_prop:s0 exact int
 
 ###mediaserver 64 bit enable flag
 ro.mediaserver.64b.enable u:object_r:vendor_medsrv_set_64b:s0 exact bool
