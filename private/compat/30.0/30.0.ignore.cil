@@ -8,6 +8,7 @@
     ab_update_gki_prop
     adbd_config_prop
     apc_service
+    apex_appsearch_data_file
     apex_art_data_file
     apex_art_staging_data_file
     apex_info_file
@@ -17,9 +18,6 @@
     app_hibernation_service
     appcompat_data_file
     arm64_memtag_prop
-    artd
-    artd_exec
-    artd_service
     authorization_service
     bootanim_config_prop
     camerax_extensions_prop
@@ -27,6 +25,7 @@
     cgroup_v2
     codec2_config_prop
     ctl_snapuserd_prop
+    dck_prop
     debugfs_kprobes
     debugfs_mm_events_tracing
     debugfs_bootreceiver_tracing

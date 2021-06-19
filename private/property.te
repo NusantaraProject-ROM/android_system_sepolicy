@@ -35,7 +35,9 @@ system_internal_prop(userspace_reboot_log_prop)
 system_internal_prop(userspace_reboot_test_prop)
 system_internal_prop(verity_status_prop)
 system_internal_prop(zygote_wrap_prop)
+system_internal_prop(ctl_mediatranscoding_prop)
 vendor_restricted_prop(vendor_medsrv_set_64b)
+
 ###
 ### Neverallow rules
 ###
