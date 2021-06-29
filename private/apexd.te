@@ -18,8 +18,6 @@ allow apexd apex_ota_reserved_file:dir create_dir_perms;
 allow apexd apex_ota_reserved_file:file create_file_perms;
 
 # Allow apexd to create files and directories for snapshots of apex data
-allow apexd apex_appsearch_data_file:dir { create_dir_perms relabelto };
-allow apexd apex_appsearch_data_file:file { create_file_perms relabelto };
 allow apexd apex_art_data_file:dir { create_dir_perms relabelto };
 allow apexd apex_art_data_file:file { create_file_perms relabelto };
 allow apexd apex_permission_data_file:dir { create_dir_perms relabelto };
@@ -83,9 +81,6 @@ allow apexd apex_mnt_dir:lnk_file create_file_perms;
 # allow apexd to create /apex/apex-info-list.xml and relabel to apex_info_file
 allow apexd apex_mnt_dir:file { create_file_perms relabelfrom mounton };
 allow apexd apex_info_file:file relabelto;
-# apexd needs to update /apex/apex-info-list.xml after non-staged APEX update.
-allow apexd apex_info_file:file rw_file_perms;
-
 # allow apexd to unlink apex files in /data/apex/active
 # note that apexd won't be able to unlink files in /data/app-staging/session_XXXX,
 # because it doesn't have write permission for staging_data_file object.
@@ -191,13 +186,6 @@ neverallow { domain -apexd -init } apexd_prop:property_service set;
 
 # only apexd can write apex-info-list.xml
 neverallow { domain -apexd } apex_info_file:file no_w_file_perms;
-
-# Only apexd and init should be allowed to manage /apex mounts
-# A note on otapreopt_chroot. It used to mount APEXes during postainstall stage of A/B OTAs,
-# but starting from S it just calls into apexd to prepare /apex for otapreoprt. Once the sepolicies
-# around otapreopt_chroot are cleaned up we should be able to remove it from the lists below.
-neverallow { domain -apexd -init -otapreopt_chroot } apex_mnt_dir:filesystem { mount unmount };
-neverallow { domain -apexd -init -otapreopt_chroot } apex_mnt_dir:dir { mounton };
 
 # Allow for use in postinstall
 allow apexd otapreopt_chroot:fd use;

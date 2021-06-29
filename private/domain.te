@@ -539,8 +539,3 @@ enforce_debugfs_restriction(`
       -tracefs_type
   }:file no_rw_file_perms;
 ')
-
-
-###Mediaserverwrapper 64 Bit Property  addition
-get_prop(domain, vendor_medsrv_set_64b)
-

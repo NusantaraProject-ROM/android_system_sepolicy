@@ -41,7 +41,4 @@ recovery_only(`
 
   # Mount /metadata to interact with Virtual A/B snapshots.
   allow fastbootd labeledfs:filesystem { mount unmount };
-
-  # Needed for reading boot properties.
-  allow fastbootd proc_bootconfig:file r_file_perms;
 ')

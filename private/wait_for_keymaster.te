@@ -10,6 +10,6 @@ allow wait_for_keymaster kmsg_device:chr_file w_file_perms;
 
 # wait_for_keymaster needs to find keystore and call methods with the returned
 # binder reference.
-binder_use(wait_for_keymaster)
+allow wait_for_keymaster servicemanager:binder call;
 allow wait_for_keymaster keystore_service:service_manager find;
-binder_call(wait_for_keymaster, keystore)
+allow wait_for_keymaster keystore:binder call;
