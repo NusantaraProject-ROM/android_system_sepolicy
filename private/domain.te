@@ -77,9 +77,6 @@ get_prop(domain, module_sdkextensions_prop)
 # Read access to bq configuration values
 get_prop(domain, bq_config_prop);
 
-get_prop(domain, vendor_medsrv_set_64b)
-
-
 # For now, everyone can access core property files
 # Device specific properties are not granted by default
 not_compatible_property(`

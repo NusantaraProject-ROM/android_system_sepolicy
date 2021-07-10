@@ -35,7 +35,7 @@ system_internal_prop(userspace_reboot_log_prop)
 system_internal_prop(userspace_reboot_test_prop)
 system_internal_prop(verity_status_prop)
 system_internal_prop(zygote_wrap_prop)
-vendor_restricted_prop(vendor_medsrv_set_64b)
+
 ###
 ### Neverallow rules
 ###
@@ -546,13 +546,6 @@ neverallow {
   domain
   -init
 } zygote_wrap_prop:property_service set;
-
-neverallow {
-  domain
-  -init
-  -dumpstate
-  -vendor_init
-} vendor_medsrv_set_64b:property_service set;
 
 neverallow {
   domain
