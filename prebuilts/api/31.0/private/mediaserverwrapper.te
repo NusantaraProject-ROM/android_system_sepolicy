@@ -5,3 +5,5 @@ init_daemon_domain(mediaserverwrapper)
 domain_auto_trans(mediaserverwrapper, mediaserver_exec, mediaserver);
 allow mediaserverwrapper mediaserver_exec:file { execute open read getattr map execute_no_trans };
 allow mediaserver mediaserverwrapper:fd use;
+# Let vendor_init set vendor_medsrv_set_64b.
+set_prop(vendor_init, vendor_medsrv_set_64b)
