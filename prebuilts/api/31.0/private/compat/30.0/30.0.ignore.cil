@@ -20,6 +20,7 @@
     arm64_memtag_prop
     authorization_service
     bootanim_config_prop
+    camera2_extensions_prop
     camerax_extensions_prop
     cgroup_desc_api_file
     cgroup_v2
@@ -66,12 +67,15 @@
     hal_remotelyprovisionedcomponent_service
     hal_secureclock_service
     hal_sharedsecret_service
+    hal_uwb_service
     hal_weaver_service
     hw_timeout_multiplier_prop
     keystore_compat_hal_service
     keystore_maintenance_service
+    keystore_metrics_service
     keystore2_key_contexts_file
     legacy_permission_service
+    legacykeystore_service
     location_time_zone_manager_service
     media_communication_service
     media_metrics_service
@@ -142,7 +146,6 @@
     vibrator_manager_service
     virtualization_service
     vpn_management_service
-    vpnprofilestore_service
     watchdog_metadata_file
     wifi_key
     zygote_config_prop))
