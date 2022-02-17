@@ -323,6 +323,9 @@ audio.offload.min.duration.secs u:object_r:audio_config_prop:s0 exact int
 ro.audio.ignore_effects   u:object_r:audio_config_prop:s0 exact bool
 ro.audio.monitorRotation  u:object_r:audio_config_prop:s0 exact bool
 ro.audio.offload_wakelock u:object_r:audio_config_prop:s0 exact bool
+# Boolean property used in AudioService to configure whether
+# spatializer functionality should be initialized
+ro.audio.spatializer_enabled u:object_r:audio_config_prop:s0 exact bool
 
 persist.config.calibration_fac u:object_r:camera_calibration_prop:s0 exact string
 
@@ -672,6 +675,8 @@ ro.boot.revision           u:object_r:bootloader_prop:s0 exact string
 ro.boot.vbmeta.avb_version u:object_r:bootloader_prop:s0 exact string
 ro.boot.verifiedbootstate  u:object_r:bootloader_prop:s0 exact string
 ro.boot.veritymode         u:object_r:bootloader_prop:s0 exact string
+# Properties specific to virtualized deployments of Android
+ro.boot.hypervisor.version                  u:object_r:hypervisor_prop:s0 exact string
 
 # These ro.X properties are set to values of ro.boot.X by property_service.
 ro.baseband   u:object_r:bootloader_prop:s0 exact string
@@ -1108,6 +1113,8 @@ cache_key.telephony.                     u:object_r:binder_cache_telephony_serve
 framework_watchdog.fatal_count                u:object_r:framework_watchdog_config_prop:s0 exact int
 framework_watchdog.fatal_window.second        u:object_r:framework_watchdog_config_prop:s0 exact int
 
+gsm.operator.iso-country       u:object_r:telephony_status_prop:s0 exact string
+gsm.sim.operator.iso-country   u:object_r:telephony_status_prop:s0 exact string
 gsm.sim.operator.numeric       u:object_r:telephony_status_prop:s0 exact string
 persist.radio.airplane_mode_on u:object_r:telephony_status_prop:s0 exact bool
 

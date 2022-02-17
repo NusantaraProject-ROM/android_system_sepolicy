@@ -374,6 +374,7 @@
 /system/bin/android\.frameworks\.automotive\.display@1\.0-service u:object_r:automotive_display_service_exec:s0
 /system/bin/snapuserd            u:object_r:snapuserd_exec:s0
 /system/bin/odsign               u:object_r:odsign_exec:s0
+/system/bin/vehicle_binding_util     u:object_r:vehicle_binding_util_exec:s0
 
 #############################
 # Vendor files
@@ -477,6 +478,7 @@
 /(system_ext|system/system_ext)/etc/selinux/system_ext_seapp_contexts       u:object_r:seapp_contexts_file:s0
 /(system_ext|system/system_ext)/etc/selinux/system_ext_service_contexts     u:object_r:service_contexts_file:s0
 /(system_ext|system/system_ext)/etc/selinux/system_ext_mac_permissions\.xml u:object_r:mac_perms_file:s0
+/(system_ext|system/system_ext)/etc/selinux/userdebug_plat_sepolicy\.cil    u:object_r:sepolicy_file:s0
 
 /(system_ext|system/system_ext)/bin/aidl_lazy_test_server   u:object_r:aidl_lazy_test_server_exec:s0
 /(system_ext|system/system_ext)/bin/hidl_lazy_test_server   u:object_r:hidl_lazy_test_server_exec:s0
