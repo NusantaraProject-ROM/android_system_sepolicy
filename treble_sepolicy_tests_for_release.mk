@@ -10,6 +10,8 @@ LOCAL_LICENSE_CONDITIONS := notice unencumbered
 LOCAL_NOTICE_FILE := $(LOCAL_PATH)/NOTICE
 LOCAL_MODULE_CLASS := FAKE
 LOCAL_MODULE_TAGS := optional
+SYSTEM_EXT_PREBUILT_POLICY  := $(BOARD_SYSTEM_EXT_PREBUILT_DIR)
+PRODUCT_PREBUILT_POLICY  := $(BOARD_PRODUCT_PREBUILT_DIR)
 
 # BOARD_SYSTEM_EXT_PREBUILT_DIR can be set as system_ext prebuilt dir in sepolicy
 # make file of the system_ext partition.
@@ -134,6 +136,7 @@ $($(version)_compat): $(HOST_OUT_EXECUTABLES)/secilc $(cil_files)
 	$(hide) $(HOST_OUT_EXECUTABLES)/secilc -m -M true -G -N -c $(POLICYVERS) \
 		$(PRIVATE_CIL_FILES) -o $@ -f /dev/null
 
+
 # $(version)_mapping.combined.cil - a combination of the mapping file used when
 # combining the current platform policy with nonplatform policy based on the
 # $(version) policy release and also a special ignored file that exists purely for
@@ -186,6 +189,8 @@ public_cil_files :=
 cil_files :=
 $(version)_compat :=
 $(version)_mapping.cil :=
+$(version)_system_ext_compat :=
+$(version)_product_compat :=
 $(version)_mapping.combined.cil :=
 $(version)_mapping.ignore.cil :=
 $(version)_nonplat :=
